@@ -3,12 +3,13 @@
 
 % to-do list
 % ----------
-% - Synchronize to a git repository, and synchronize also the notebooks.
 % - Look for all instances of HOGG, MB, and CITE.
 % - Make an acronym command and fix CLRB and all other acronyms.
 % - Be sure to discuss SNR in a continuum resolution element, as well as in a pixel.
 %.- Make sure that, for any assumption that is explicitly tested, the forthcoming test is mentioned when the assumption is introduced.
-% - Are we clear that we exponentiate the model to get the true data?
+% - Are we clear that we exponentiate the model to get the true data expectation?
+% - Are we consistent in our use of Doppler shift, radial velocity, and redshift and so on?
+% - Are we sensible in our use of first person?
 
 \documentclass[modern]{aastex631}
 \usepackage[utf8]{inputenc}
@@ -42,9 +43,11 @@
 \newcommand{\unit}[1]{\mathrm{#1}}
 \newcommand{\m}{\unit{m}}
 \newcommand{\cm}{\unit{cm}}
+\newcommand{\km}{\unit{km}}
 \newcommand{\s}{\unit{s}}
-\newcommand{\cmps}{\cm\,s^{-1}}
-\newcommand{\mps}{\m\,s^{-1}}
+\newcommand{\cmps}{\cm\,\s^{-1}}
+\newcommand{\mps}{\m\,\s^{-1}}
+\newcommand{\kmps}{\km\,\s^{-1}}
 
 % Text macros
 \newcommand{\project}[1]{\textsl{#1}}
@@ -268,7 +271,7 @@ We included no telluric absorption in these toy data.
 \begin{figure}[tp]
   \begin{mdframed}
     \begin{center}
-    \includegraphics[width=\textwidth]{data.pdf}
+    \includegraphics[width=\textwidth]{../notebook/data.png}
     \end{center}
     \caption{Several example toy-data spectra, generated according to the rules described in the main text.
     At each epoch the true spectrum has the same overall shape; the only differences from epoch to epoch are from Doppler-shift changes and shot noise.\label{fig:data}}
@@ -302,7 +305,7 @@ This figure shows, as expected, that with this use of a perfect template, the mi
   \end{mdframed}
 \end{figure}
 
-HOGG: Maybe show that the wrong template (like missing some lines) gives less-good RVs.
+HOGG: Maybe show that the wrong template (like missing some lines) gives less-good RVs?? Or move this to \secref{sec:sensitivity}??
 
 \section{Cross-correlation}\label{sec:ccf}
 
@@ -439,7 +442,7 @@ The binary mask created this way is visualized in \figref{fig:binarymask}.
 \begin{figure}[t]
   \begin{mdframed}
     \begin{center}
-    [HOGG: NEED FIGURE HERE]
+    \includegraphics[width=\textwidth]{../notebook/binarymask.png}
     \end{center}
     \caption{HOGG: A visualization of part of the binary mask.\label{fig:binarymask}}
   \end{mdframed}
@@ -481,16 +484,34 @@ This realization is the fundamental motivation for the \wobble{} project (\citea
 
 HOGG: Quantitative argument using SNR and scalings.
 
-HOGG: Demonstration with the toy data: FT the data, filter, shift and average, get RVs, shift and average again, and so on.
+Empirical templates can be created by interpolating spectra to a common logarithmic wavelength grid and averaging.
+Interpolations wwre performed with cubic splines.
+With an empirical template in hand, cross-correlation doppler shifts can be estimated, updating the beliefs about the spectra rest frames, and then the templates can be re-made.
+This process can be iterated to convergence.
+In this process, the initialization matters.
+In making the results in this \sectionname, we initialized at the wrong binary-mask results shown in \figref{fig:bccfrvswrong}, not at good radial-velocities, and yet the results are excellent.
+That is, we didn't cheat.
+We show the empirical-spectrum cross-correlation radial-velocity results in \figref{fig:empiricalrvs}
+
+\begin{figure}[t]
+  \begin{mdframed}
+    \begin{center}
+    [HOGG: NEED FIGURE HERE]
+    \end{center}
+    \caption{HOGG: Something that shows the empirical-spectrum CCFs deliver good RVs.\label{fig:empiricalrvs}}
+  \end{mdframed}
+\end{figure}
 
 HOGG: Note the sensitivity to edge effects.... How did we deal with that?
 
 HOGG: IS THERE A BIAS WHEN YOU USE THE SPECTRUM IN ITS OWN ANALYSIS? EXPERIMENT WITH LOO. (Later: Did this; it is a very small effect at this sample size. Maybe try a smaller sample?)
 
+HOGG: Note that there is no absolute velocity here.
+
 \section{Sensitivity to assumptions}\label{sec:sensitivity}
 
 We opened (\secref{sec:assumptions}) with a long list of restrictive assumptions.
-Here we perform experiments in which we make the data weakly incompatible with the assumptions and look at how the radial-velocity measurements are affected.
+Here we perform experiments in which we make the data weakly incompatible with some of these assumptions and look at how the radial-velocity measurements are affected.
 
 \noindent
 \paragraph{Wavelength calibration issues}
