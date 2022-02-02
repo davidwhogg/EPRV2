@@ -8,6 +8,7 @@
 % - Make an acronym command and fix CLRB and all other acronyms.
 % - Be sure to discuss SNR in a continuum resolution element, as well as in a pixel.
 %.- Make sure that, for any assumption that is explicitly tested, the forthcoming test is mentioned when the assumption is introduced.
+% - Are we clear that we exponentiate the model to get the true data?
 
 \documentclass[modern]{aastex631}
 \usepackage[utf8]{inputenc}
@@ -428,8 +429,12 @@ Because the binary mask involves very fine structure in the $x$ space, in practi
 In practice most real pipelines do the latter, we believe.
 The binary-mask cross-correlations we compute here (below) are computed by interpolating (with a cubic spline interpolator) the data $y_i$ onto the non-zero parts of the binary mask and then integrating over the small binary-mask windows.
 
-In the toy-data system, we made the binary mask HOGG HOW??
-The binary mask created this way is shown in \figref{fig:binarymask}.
+In the toy-data system, we made the binary mask by processing the list of true line locations and true line equivalent widths that was used to make the true spectral expectation (\secref{sec:data}).
+The binary mask is set to zero everywhere except in a set of non-zero windows, one centered on each true line above an equivalent width limit of HOGG WHAT.
+Each window gets a width that is $1/4$ of the true line equivalent width.
+Windows are deleted if they are within Doppler shifts of $\pm 40\,\kmps$ of either edge of the observed spectral range, so that there are no difficult edge effects (at some loss of spectral features).
+Windows that overlap are combined by adopting width-weighted average locations and adding the widths.
+The binary mask created this way is visualized in \figref{fig:binarymask}.
 
 \begin{figure}[t]
   \begin{mdframed}
@@ -462,7 +467,9 @@ These post-processed binary-mask results do saturate the bound.
   \end{mdframed}
 \end{figure}
 
-HOGG: Note that the binary-mask operations are very sensitive to edge effects. In what we did above, we removed lines near the edges of the observed spectral range, so that our results aren't contaminated by variations resulting from lines entering and leaving the spectral range.
+Experiments suggest that the binary-mask operations are very sensitive to edge effects.
+In making the mask, we removed lines near the edges of the observed spectral range, so that our results aren't contaminated by variations resulting from lines entering and leaving the spectral range.
+This probably leads to a small loss in precision, but the results saturate the information-theoretic bound nonetheless.
 
 \section{Empirical spectral templates}\label{sec:templates}
 
