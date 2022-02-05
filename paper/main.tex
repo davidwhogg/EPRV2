@@ -3,7 +3,7 @@
 
 % to-do list
 % ----------
-% - Look for all instances of HOGG, MB, and CITE.
+% - Look for all instances of HOGG, BEDELL, and CITE.
 % - Make an acronym command and fix CLRB and all other acronyms.
 % - Be sure to discuss SNR in a continuum resolution element, as well as in a pixel.
 %.- Make sure that, for any assumption that is explicitly tested, the forthcoming test is mentioned when the assumption is introduced.
@@ -12,6 +12,7 @@
 % - Are we sensible in our use of first person?
 % - Do we address the relationship between our tiny spectral segment and a full spectrograph? Get scalings. Etc.
 % - Make sure all figures are explicitly referred to in the text.
+% - I believe we are inconsistent with the tense. Always present or always past? Decide and audit / fix. Probably present is better.
 
 \documentclass[modern]{aastex631}
 \usepackage[utf8]{inputenc}
@@ -22,7 +23,7 @@
 \usepackage[framemethod=tikz]{mdframed}
 \usetikzlibrary{shadows}
 \definecolor{captiongray}{HTML}{555555}
-\mdfsetup{%                                                                                          
+\mdfsetup{%
   innertopmargin=2ex,
   innerbottommargin=1.8ex,
   linecolor=captiongray,
@@ -66,7 +67,7 @@
 \frenchspacing\raggedbottom\sloppy\sloppypar
 
 % headers and date
-\renewcommand{\today}{2022 January} % hurt me
+\renewcommand{\today}{2022 February} % hurt me
 \shorttitle{how to measure a radial velocity}
 \shortauthors{hogg {\footnotesize\&} bedell}
 \begin{document}
@@ -88,6 +89,7 @@
     If there are sufficient spectral measurements of the star, this template can be made empirically, and still produce minimum-variance radial-velocity measurements.
     Cross-correlation with a binary template (which is not in itself a good model for the stellar spectrum) can approach minimum variance if the cross-correlation is followed by a post-processing step in which a smooth model is fit to the cross-correlation function.
     These results justify practices in present-day data pipelines, but also suggest small improvements that might be important.
+    HOGG: SENTENCE ABOUT ADDING TELLURIC NOISE, CALIBRATION NOISE, SPECTRAL VARIATIONS.
     The biggest limitation of this analysis is the strong assumption that the star's spectrum does not vary with time.
     This is demonstrably false; we discuss approaches for weakening this assumption.
 \end{abstract}
@@ -177,7 +179,7 @@ These are the assumptions we will make in this project:
         x &\equiv \ln\lambda ~.
     \end{align}
     This is a choice, not an assumption, but working in logarithmic wavelength $x$ simplifies the mathematics and notation, because it makes the Doppler shift a linear shift in $x$, and a spectrograph with wavelength-independent resolution $R$ has a line-spread function that is constant-width $1/R$ in $x$.
-    More importantly, we will assume that the sampling of the data is good in a Nyquist sense, given the spectrograph resolution; that is, we will assume that the pixel spacing $\Delta x<1/(2\,R)$ (HOGG: NOTATION?).
+    More importantly, we will assume that the sampling of the data is good in a Nyquist sense, given the spectrograph resolution; that is, we will assume that the pixel spacing $\Delta x<1/(2\,R)$.
     \item[pure radial Doppler] Related to all of the above, we will treat the RV of the star as a pure shift $\delta x$ in log wavelength $x$.
     The shift $\delta x$ induced by a change $\delta v$ in the radial velocity of the star with respect to the spectrograph is given by
     \begin{align}
@@ -187,11 +189,14 @@ These are the assumptions we will make in this project:
     where $c$ is the speed of light in vacuum.
     This is pretty general, but even this involves some deep assumptions:
     For example, it assumes that there is no plasma or medium along the line of sight that modifies the Doppler formula,
-    it assumes that there is no significant transverse component to the Doppler shift,
-    and it assumes that the spectrograph has a well-defined velocity (which might not be true for a bench-mounted spectrograph connected to a tracking telescope on a rotating planet). HOGG ALSO THE BERVS CAN DEPEND ON WAVELENGTH; CITE EXPRES PAPER.
+    it assumes (at the interpretation step) that there is no significant transverse component to the Doppler shift,
+    and it assumes that the spectrograph has a well-defined velocity (which is not be true for a bench-mounted spectrograph connected to a tracking telescope on a rotating, orbiting planet).
+    Related to this, there is a deep assumption that the radial velocity has the same value everywhere in the spectrum.
+    This might seem obviously true!
+    But in fact it is weakly violated in real data because the throughput of the atmosphere plus spectrograph can be a function of both wavelength and time, and the barycentric contribution to the radial velocity is changing during the exposure (\citealt{berv-lambda}).
 \end{description}
 Every one of these assumptions is wrong, or badly wrong, or at least questionable.
-We will return to them at the end in the discussion (\secref{sec:discussion}).
+We will return to them at the end in \secref{sec:sensitivity} and \secref{sec:discussion}.
 
 \section{Information theory}\label{sec:info}
 
@@ -263,12 +268,14 @@ The model spectra are made with an exactly unit continuum and a set of discrete 
 The lines are drawn from a uniform Poisson process in the long-wavelength $x$ domain.
 Their equivalent widths are drawn from a power-law distribution function.
 The spectrograph line-spread function is set to be a Gaussian in the log-wavelength $x$ space, with a standard deviation $\sigma_x=1/R$, where $R=135\,000$ is the spectrograph resolution.
-Technically the Gaussian line-spread function is used to generate the logarithm of the flux, which is then exponentiated to deliver the pixel flux expectations. HOGG SHOULD WE HAVE AN EQUATION HERE?
+Technically the Gaussian line-spread function is used to generate the logarithm of the flux, which is then exponentiated to deliver the pixel flux expectations.
+BEDELL SHOULD WE PUT AN EQUATION HERE, OR IS THIS EXPONENTIATION POINT CLEAR?
 The noise on the continuum-normalized spectral pixel values is Gaussian with zero mean and variance proportional to the continuum-normalized spectral expectation (true intensity).
 This noise is explicitly white; it is designed to model photon or shot noise.
 The noise variance model is normalized to hit a particular signal-to-noise ratio (SNR) in the continuum (that is, at a continuum-normalized flux $y=1$); typically we set this SNR to 100 (per pixel).
 The true Doppler shifts $\delta x\equiv\ln\sqrt{(c+v)/(c-v)}\approx v/c$ for the different spectra are generated by a pure sinusoid of the epoch number with an amplitude of $1\times10^{-4}$, corresponding to something like barycentric variation.
 We included no telluric absorption in these toy data.
+Example spectra are shown in \figref{fig:data} and \figref{fig:datazoom}.
 
 \begin{figure}[tp]
   \begin{mdframed}
@@ -312,7 +319,11 @@ This figure shows, as expected, that with this use of a perfect template, the mi
     \includegraphics[width=\textwidth]{../notebook/full.png}
     \includegraphics[width=\textwidth]{../notebook/mlrvs.png}
     \end{center}
-    \caption{HOGG: Something that shows the maximum-likelihood radial-velocity estimates for all epochs, that they saturate the bound.\label{fig:mlrvs}}
+    \caption{Demonstration that maximum-likelihood estimates saturate the information-theoretic bound.
+    The top panel shows both the true doppler shifts for the 64 epochs of toy data and the maximum-likelihood estimates.
+    The bottom panel shows the residuals (estimate minus true) as a function of true doppler shift.
+    In the bottom panel, the thin red lines indicate the Cram\'er--Rao lower bound on the root-variance (the square-root of the inverse of the Fisher information), and the thick grey lines indicate the empirical central 68-percent region (the empirical one-sigma region).
+    The fact that the thin red lines overlap the thick grey lines shows that the maximum-likelihood estimates saturate the information-theoretic bound, as expected.\label{fig:mlrvs}}
   \end{mdframed}
 \end{figure}
 
@@ -372,7 +383,7 @@ This is illustrated in \figref{fig:ccf}.
     \begin{center}
     \includegraphics[width=\textwidth]{../notebook/ccf.png}
     \end{center}
-    \caption{HOGG: Something that shows the CCF for one epoch, and a zoom in showing the parabola fit.\label{fig:ccf}}
+    \caption{Optimizing a function with the parabola trick. The left panel shows the cross-correlation amplitude (data cross-correlated with a correct template spectrum) measured at a discrete set of Doppler shifts. The right panel shows a zoom in on the peak. The smooth parabola is fit to the three peak values of the cross-correlation function, and the vertical line shows the optimum of that parabola.\label{fig:ccf}}
   \end{mdframed}
 \end{figure}
 
@@ -384,7 +395,7 @@ As expected, these radial-velocity estimates also saturate the information-theor
     \begin{center}
     \includegraphics[width=\textwidth]{../notebook/ccfrvs.png}
     \end{center}
-    \caption{HOGG: Something that shows the CCF RVs for all epochs, that they saturate the bound.\label{fig:ccfrvs}}
+    \caption{Same as the bottom panel of \figref{fig:mlrvs}, but for the cross-correlation Doppler-shift estimates. The coincidence of the thin red and thick grey lines shows that the cross-correlation estimates saturate the information-theoretic bound.\label{fig:ccfrvs}}
   \end{mdframed}
 \end{figure}
 
@@ -455,7 +466,7 @@ The binary mask created this way is visualized in \figref{fig:binarymask}.
     \begin{center}
     \includegraphics[width=\textwidth]{../notebook/binarymask.png}
     \end{center}
-    \caption{HOGG: A visualization of part of the binary mask. HOGG: Comment on the left edge (no windows).\label{fig:binarymask}}
+    \caption{A visualization of part of the binary mask. The dark black step function shows the same spectral segment shown in \figref{fig:datazoom}, but the light red filled step function shows the binary mask employed in the text, Doppler shifted to the correct Doppler shift for this epoch. Note that the binary mask is zeroed out in a segment at the left edge of the top plot; this is a result of the censoring of lines that might Doppler shift in and out of the observed spectral range.\label{fig:binarymask}}
   \end{mdframed}
 \end{figure}
 
@@ -469,7 +480,7 @@ These post-processed binary-mask results do saturate the bound.
     \begin{center}
     \includegraphics[width=\textwidth]{../notebook/bccfrvswrong.png}
     \end{center}
-    \caption{HOGG: Something that shows the binary-mask CCF RVs are terrible if naively optimized.\label{fig:bccfrvswrong}}
+    \caption{Same as the bottom panel of \figref{fig:mlrvs} but showing the results of naively optimizing the cross-correlation of the data with the binary mask. These estimates do not saturate the information-theoretic bound because the binary mask is not a good representation of the spectral expectation.\label{fig:bccfrvswrong}}
   \end{mdframed}
 \end{figure}%
 \begin{figure}[tp]
@@ -477,7 +488,7 @@ These post-processed binary-mask results do saturate the bound.
     \begin{center}
     \includegraphics[width=\textwidth]{../notebook/bccfrvs.png}
     \end{center}
-    \caption{HOGG: Something that shows the binary-mask CCFs deliver good RVs when fit after the fact with a Gaussian function.\label{fig:bccfrvs}}
+    \caption{Same as the bottom panel of \figref{fig:mlrvs} but showing the results of optimizing the fit of a Gaussian function to the cross-correlation of the data with the binary mask. Compare this with \figref{fig:bccfrvswrong}. Binary-mask cross-correlation functions deliver bound-saturating Doppler-shift estimates when fit after the fact with a Gaussian function. See text for discussion.\label{fig:bccfrvs}}
   \end{mdframed}
 \end{figure}
 
@@ -510,16 +521,15 @@ empirical-spectrum cross-correlation radial-velocity results in \figref{fig:empi
     \begin{center}
     \includegraphics[width=\textwidth]{../notebook/empirical.png}
     \end{center}
-    \caption{HOGG: A visualization of part of the empirical template. HOGG: Comment on the left edge (no windows).\label{fig:empirical}}
+    \caption{A visualization of part of the empirical spectral template. The dark black step function shows the same spectral segment shown in \figref{fig:datazoom}, but the thin red smooth line now shows not the true spectral template but instead the empirical template obtained by shifting and averaging the observed data. Note that the empirical template constructed here has no lines in a segment at the left edge of the top plot; this is a result of the censoring of spectral regions that might Doppler shift in and out of the observed spectral range.\label{fig:empirical}}
   \end{mdframed}
 \end{figure}
-
 \begin{figure}[tp]
   \begin{mdframed}
     \begin{center}
     \includegraphics[width=\textwidth]{../notebook/empiricalrvs.png}
     \end{center}
-    \caption{HOGG: Something that shows the empirical-spectrum CCFs deliver good RVs.\label{fig:empiricalrvs}}
+    \caption{Same as the bottom panel of \figref{fig:mlrvs} but showing the results of optimizing the cross-correlation of the data with an empirical template made from the epoch data themselves. Compare with \figref{fig:ccfrvs}; this shows that empirical templates are just as good as true templates; they both saturate the information-theoretic bounds.\label{fig:empiricalrvs}}
   \end{mdframed}
 \end{figure}
 
@@ -544,6 +554,12 @@ Here we perform experiments in which we make the data weakly incompatible with s
 \paragraph{Small spectral variations}
 
 \section{Discussion}\label{sec:discussion}
+
+HOGG: Return to the assumptions and discuss them at least briefly, and what happens if you want to weaken them.
+
+HOGG: In the above, make sure to comment on the conceptual point of whether you are measuring a velocity wrt the spectrograph, or a velocity wrt the Solar-System barycenter (as EXPRES does). This distinction is important to the design of extraction pipelines, but doesn't change any of our story here.
+
+HOGG: Do the time-invariant spectrum assumption last and discuss the different possible approaches to this problem.
 
 \software{
 \project{numpy} \citep{numpy};
