@@ -309,7 +309,8 @@ This figure shows, as expected, that with this use of a perfect template, the mi
 \begin{figure}[tp]
   \begin{mdframed}
     \begin{center}
-    [HOGG: NEED FIGURE HERE]
+    \includegraphics[width=\textwidth]{../notebook/full.png}
+    \includegraphics[width=\textwidth]{../notebook/mlrvs.png}
     \end{center}
     \caption{HOGG: Something that shows the maximum-likelihood radial-velocity estimates for all epochs, that they saturate the bound.\label{fig:mlrvs}}
   \end{mdframed}
@@ -454,7 +455,7 @@ The binary mask created this way is visualized in \figref{fig:binarymask}.
     \begin{center}
     \includegraphics[width=\textwidth]{../notebook/binarymask.png}
     \end{center}
-    \caption{HOGG: A visualization of part of the binary mask.\label{fig:binarymask}}
+    \caption{HOGG: A visualization of part of the binary mask. HOGG: Comment on the left edge (no windows).\label{fig:binarymask}}
   \end{mdframed}
 \end{figure}
 
@@ -501,7 +502,17 @@ This process can be iterated to convergence.
 In this process, the initialization matters.
 In making the results in this \sectionname, we initialized at the wrong binary-mask results shown in \figref{fig:bccfrvswrong}, not at good radial-velocities, and yet the results are excellent.
 That is, we didn't cheat.
-We show the empirical-spectrum cross-correlation radial-velocity results in \figref{fig:empiricalrvs}
+We show the empirical template in \figref{fig:empirical} and we show the
+empirical-spectrum cross-correlation radial-velocity results in \figref{fig:empiricalrvs}
+
+\begin{figure}[tp]
+  \begin{mdframed}
+    \begin{center}
+    \includegraphics[width=\textwidth]{../notebook/empirical.png}
+    \end{center}
+    \caption{HOGG: A visualization of part of the empirical template. HOGG: Comment on the left edge (no windows).\label{fig:empirical}}
+  \end{mdframed}
+\end{figure}
 
 \begin{figure}[tp]
   \begin{mdframed}
