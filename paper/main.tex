@@ -13,6 +13,9 @@
 % - Do we address the relationship between our tiny spectral segment and a full spectrograph? Get scalings. Etc.
 % - Make sure all figures are explicitly referred to in the text.
 % - I believe we are inconsistent with the tense. Always present or always past? Decide and audit / fix. Probably present is better.
+% - I think we should only measure Doppler shift, and never RV. Right??
+% - Cite Vakili et al for the parabola trick, maybe?
+% - Make the comment that the detailed noise model doesn't matter -- the CCF RVs are as good as the ML RVs.
 
 \documentclass[modern]{aastex631}
 \usepackage[utf8]{inputenc}
@@ -548,6 +551,8 @@ Here we perform experiments in which we make the data weakly incompatible with s
 \paragraph{Wavelength calibration issues}
 In \secref{sec:assumptions} and everything else above, we assumed that...HOGG
 
+HOGG: Refer to \figref{fig:calibration}
+
 \begin{figure}[tp]
   \begin{mdframed}
     \begin{center}
@@ -565,19 +570,23 @@ However, it is possible for there to be tiny, unknown telluric features that aff
 (HOGG COMMENT that wobble can handle these!)
 Here we test the sensitivity to this assumption by adding in HOGG WHAT AND HOW?
 
+HOGG: Refer to \figref{fig:telluric}.
+
 \begin{figure}[tp]
   \begin{mdframed}
     \begin{center}
     \includegraphics[width=\textwidth]{../notebook/telluricmodel.png}
     \includegraphics[width=\textwidth]{../notebook/telluric.png}
     \end{center}
-    \caption{The top panels show the introduced telluric effect in blue, in comparison with the true spectral template (in red, repeated from \figref{fig:datazoom}). The bottom panel is the same \figref{fig:ccfrvs} but now showing cross-correlation results after this unmodeled telluric contamination is introduced.\label{fig:variable}}
+    \caption{The top panels show the introduced telluric effect in a thick blue line, in comparison with the true spectral template (thin red line, repeated from \figref{fig:datazoom}). The telluric template (thick blue) stays fixed in logarithmic wavelength $x$ while the spectral template (thin red) Doppler shifts. The bottom panel is the same \figref{fig:ccfrvs} but now showing cross-correlation results after this unmodeled telluric contamination is introduced.\label{fig:telluric}}
   \end{mdframed}
 \end{figure}
 
 \noindent
 \paragraph{Small spectral variations}
 In \secref{sec:assumptions} and everything else above, we assumed that...HOGG
+
+HOGG: Refer to \figref{fig:variable}.
 
 \begin{figure}[tp]
   \begin{mdframed}
