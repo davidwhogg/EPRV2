@@ -101,7 +101,7 @@
 A large fraction of contemporary astrophysics is built on the spectroscopic measurement of radial velocities.
 Spectroscopic radial-velocity measurements led to the discovery of the expansion of the Universe (\citealt{hubble}),
 dark matter (\citealt{zwicky}, \citealt{rubin}),
-and planets around other stars (\citealt{queloz}).
+and planets around other stars (\citealt{mayor}).
 They underpin the empirical basis of almost every branch of astrophysics.
 Present-day extreme-precision radial-velocity spectrographs---which now make measurements with better than meter-per-second precision (\citealt{what?})---are responsible for the discovery and characterization of thousands of extra-solar planets.
 This project is motivated by the importance of these instruments and their data pipelines in exoplanet science.
@@ -546,12 +546,47 @@ Here we perform experiments in which we make the data weakly incompatible with s
 
 \noindent
 \paragraph{Wavelength calibration issues}
+In \secref{sec:assumptions} and everything else above, we assumed that...HOGG
+
+\begin{figure}[tp]
+  \begin{mdframed}
+    \begin{center}
+    \includegraphics[width=\textwidth]{../notebook/calibration.png}
+    \end{center}
+    \caption{Same as \figref{fig:ccfrvs} but now showing cross-correlation results after systematic wavelength-calibration issues are introduced. THe calibration issues are below the one-thousandth-of-a-pixel level and have no net Doppler shift (see text).\label{fig:calibration}}
+  \end{mdframed}
+\end{figure}
 
 \noindent
 \paragraph{Unmodeled low-amplitude telluric lines}
+In \secref{sec:assumptions} and everything else above, we assumed that telluric lines either don't exist, or else are handled properly.
+Telluric lines can be handled by fitting and subtracting them, or by masking the data at their locations.
+However, it is possible for there to be tiny, unknown telluric features that affect the data but aren't either known or individually detectable.
+(HOGG COMMENT that wobble can handle these!)
+Here we test the sensitivity to this assumption by adding in HOGG WHAT AND HOW?
+
+\begin{figure}[tp]
+  \begin{mdframed}
+    \begin{center}
+    \includegraphics[width=\textwidth]{../notebook/telluricmodel.png}
+    \includegraphics[width=\textwidth]{../notebook/telluric.png}
+    \end{center}
+    \caption{The top panels show the introduced telluric effect in blue, in comparison with the true spectral template (in red, repeated from \figref{fig:datazoom}). The bottom panel is the same \figref{fig:ccfrvs} but now showing cross-correlation results after this unmodeled telluric contamination is introduced.\label{fig:variable}}
+  \end{mdframed}
+\end{figure}
 
 \noindent
 \paragraph{Small spectral variations}
+In \secref{sec:assumptions} and everything else above, we assumed that...HOGG
+
+\begin{figure}[tp]
+  \begin{mdframed}
+    \begin{center}
+    \includegraphics[width=\textwidth]{../notebook/variable.png}
+    \end{center}
+    \caption{Same as \figref{fig:ccfrvs} but now showing cross-correlation results after spectral variability is introduced. The variability is at the percent level in equivalent widths, only in the line equivalent widths, and not at all in line locations (see text).\label{fig:variable}}
+  \end{mdframed}
+\end{figure}
 
 \section{Discussion}\label{sec:discussion}
 
@@ -584,6 +619,15 @@ for hospitality during a critical phase of this project.
 
 \begin{thebibliography}{dummy}
   \bibitem[Bedell et al.(2019)]{wobble} Bedell, M., Hogg, D.~W., Foreman-Mackey, D., et al.\ 2019, \aj, 158, 164. doi:10.3847/1538-3881/ab40a7
+  \bibitem[Blackman et al.(2019)]{berv-lambda} Blackman, R.~T., Ong, J.~M.~J., \& Fischer, D.~A.\ 2019, \aj, 158, 40. doi:10.3847/1538-3881/ab24c3
+  \bibitem[Harris et al.(2020)]{numpy} Harris, C.~R., Millman, K.~J., van der Walt, S.~J., et al.\ 2020, \nat, 585, 357. doi:10.1038/s41586-020-2649-2
+  \bibitem[Hubble(1929)]{hubble} Hubble, E.\ 1929, Proceedings of the National Academy of Science, 15, 168. doi:10.1073/pnas.15.3.168
+  \bibitem[Hunter(2007)]{matplotlib} Hunter, J.~D.\ 2007, Computing in Science and Engineering, 9, 90. doi:10.1109/MCSE.2007.55
+  \bibitem[Mayor \& Queloz(1995)]{mayor} Mayor, M. \& Queloz, D.\ 1995, \nat, 378, 355. doi:10.1038/378355a0
+  \bibitem[Rubin et al.(1980)]{rubin} Rubin, V.~C., Ford, W.~K., \& Thonnard, N.\ 1980, \apj, 238, 471. doi:10.1086/158003
+  \bibitem[Virtanen et al.(2020)]{scipy} Virtanen, P., Gommers, R., Oliphant, T.~E., et al.\ 2020, Nature Methods, 17, 261. doi:10.1038/s41592-019-0686-2
+  \bibitem[Zhao(2021)]{zhaophd} Zhao, L.~L., 2021, PhD dissertation, Yale University
+  \bibitem[Zwicky(1933)]{zwicky} Zwicky, F.\ 1933, Helvetica Physica Acta, 6, 110
 \end{thebibliography}
 
 \end{document}
