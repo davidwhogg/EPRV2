@@ -221,7 +221,7 @@ We will return to them at the end in \secref{sec:sensitivity} and \secref{sec:di
 
 \section{Information theory}\label{sec:info}
 
-Because data are noisy, there are limits to the precision (and accuracy\footnote{HOGG}) of any measurement that you can make with those data.
+Because data are noisy, there are limits to the precision (and accuracy) of any measurement that you can make with those data.
 The Cram\'er-Rao lower bound (CRLB; \citealt{crlb}) is a quantitative result; it says that the variance of any unbiased estimator $\widehat{\theta}$ of any quantity $\theta$ given noisy data $y$ has a variance greater than or equal to the inverse of the Fisher information $I_\theta$.
 The Fisher Information is an expectation of the second derivative of the log-likelihood function with respect to the parameter $\theta$ (\citealt{fisher}); it can only be calculated in the context of a set of assumptions sufficient to deliver a specific likelihood function.
 The CLRB is a frequentist bound, because the variance of the estimator, in this case, is the variance obtained in a hypothetical program of repeated experiments (holding everything but the noise draw fixed).
@@ -531,7 +531,12 @@ The spectral template $f(x)$ can be derived directly from the observations of th
 The requirement here is that there be substantial numbers of epochs of observations, sufficient to provide an estimate of the mean spectrum that is (much) higher in signal-to-noise than the spectral data at any individual epoch.
 This realization is the fundamental motivation for the \wobble{} project (\citealt{wobble}).
 
-HOGG: Quantitative argument using SNR and scalings.
+There is a simple argument about the quality of empirical templates that goes as follows:
+Imagine that you have $N$ epochs of observation of a star, all with the same spectrograph, and each of these observations is at similar signal-to-noise ratio.
+If the star does not vary epoch-to-epoch, an empirical spectral template will accurately describe the spectrum of the star in this spectrograph (by assumption and construction), and it will have a signal-to-noise ratio that is on the order of $\sqrt{N}$ larger than the signal-to-noise of any individual epoch.
+The use of the empirical template will add in quadrature to any individual-epoch Doppler-shift uncertainty a template-origin uncertainty that is smaller by a factor of $\sqrt{N}$.
+Once $N$ is large enough---and because this additional noise adds only in quadrature---the empirical template ought to be as good (or better, since a certain kind of accuracy is guaranteed) as any theoretical spectral template for the determination of Doppler shifts.
+In the toy data we use here (\secref{sec:data}), $N=64$.
 
 Empirical templates can be created by interpolating spectra to a common logarithmic wavelength grid and averaging.
 Interpolations wwre performed with cubic splines.
@@ -560,7 +565,9 @@ empirical-spectrum cross-correlation radial-velocity results in \figref{fig:empi
   \end{mdframed}
 \end{figure}
 
-HOGG: Note the sensitivity to edge effects.... How did we deal with that?
+The empirical template can be subject to issues at its edges, since each spectral epoch reveals a slightly different stellar rest-frame spectral range in a spectrograph of fixed spectrograph-frame spectral range.
+For this reason, when we made the spectral template, we zeroed out (or really set to unity) the empirical spectra in a logarithmic wavelength range that is within $40\,\kmps$ of either edge of the template spectral range.
+Evidence of this censoring is visible in \figref{fig:empirical}.
 
 HOGG: IS THERE A BIAS WHEN YOU USE THE SPECTRUM IN ITS OWN ANALYSIS? EXPERIMENT WITH LOO. (Later: Did this; it is a very small effect at this sample size. Maybe try a smaller sample?)
 
