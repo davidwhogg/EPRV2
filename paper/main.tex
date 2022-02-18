@@ -20,6 +20,7 @@
 % - Related: we should cite the paper from Wright's group about the relativistically exact RV expressions?
 % - Cite Vakili et al for the parabola trick, maybe?
 % - Make the comment that the detailed noise model doesn't matter -- the CCF RVs are as good as the ML RVs. Probably the noise model only matters in that it can be used to censor or mask bad data.
+% - Comment on how to estimate RV uncertainties & the accuracy of those estimates for each technique??
 
 \documentclass[modern]{aastex631}
 \usepackage[utf8]{inputenc}
@@ -68,6 +69,10 @@
 \newcommand{\secref}[1]{\sectionname~\ref{#1}}
 \newcommand{\figref}[1]{\figurename~\ref{#1}}
 \newcommand{\foreign}[1]{\textsl{#1}}
+\newcommand{\acronym}[1]{\textsc{#1}}
+\newcommand{\EPRV}{\acronym{EPRV}}
+\newcommand{\RV}{\acronym{RV}}
+\newcommand{\pdf}{pdf} % should this be styled as a capitalized acronym?
 
 % Hogg typesetting / page layout pedantry
 \renewcommand{\twocolumngrid}{}
@@ -82,23 +87,27 @@
 
 \title{How to measure the radial velocity of a star:\\The invariant-spectrum case}
 \author[0000-0003-2866-9403]{David W. Hogg}
-\affil{The Flatiron Institute, a division of the Simons Foundation}
+\affil{Center for Computational Astrophysics, Flatiron Institute, 162 5th Avenue, New York, NY 10010}
 \affil{Center for Cosmology and Particle Physics, Department of Physics, New York University}
 
 \author[0000-0001-9907-7742]{Megan Bedell}
-\affil{The Flatiron Institute, a division of the Simons Foundation}
+\affil{Center for Computational Astrophysics, Flatiron Institute, 162 5th Avenue, New York, NY 10010}
 
 \begin{abstract}\noindent
-    Extremely precise spectroscopic measurements of radial velocity have led to the discovery and characterization of thousands of extra-solar planets.
-    Here we ask how to make minimum-variance radial-velocity measurements that saturate the bounds delivered by information theory.
-    The answer is: by adopting maximum-likelihood estimates, in the context of a model that is correct in relevant ways.
-    Good estimates can---under certain assumptions---also be obtained by maximizing the cross-correlation with a spectral template that accurately represents the true stellar spectrum.
-    If there are sufficient observations, this template can be made empirically, and still produce minimum-variance radial-velocity measurements.
-    Cross-correlation with a binary template (which is not in itself a good model for the stellar spectrum) can also approach minimum variance if the cross-correlation is followed by a post-processing step in which a smooth model is fit to the cross-correlation function.
-    These results justify practices in present-day data pipelines.
-    Everything here depends on strong assumptions; we find that if there are wavelength-calibration issues, unmodeled small telluric lines, or small spectral variations, none of the standard methods deliver minimum-variance estimates of radial velocity.
-    The biggest limitation of this analysis is the strong assumption that the star's spectrum does not vary with time.
-    This is demonstrably false; we discuss approaches for weakening this assumption.
+    Extremely precise spectroscopic measurements of radial velocity (\RV) have led to the discovery and characterization of thousands of extra-solar planets.
+    This science requires not only excellent spectrograph engineering, but also the use of data-analysis methods which extract RV measurements from the observed spectra without loss of information. 
+    Here we ask how to make minimum-variance radial-velocity measurements that saturate the bounds delivered by information theory. 
+    Through this lens, we demonstrate the relative performances of several common RV extraction techniques employed by modern pipelines, including forward-modeling, cross-correlation with theoretical and empirically derived template spectra, and cross-correlation with a binary mask. 
+    We find that each of these techniques is capable of delivering minimu-variance radial-velocity measurements under certain conditions. 
+    %The answer is: by adopting maximum-likelihood estimates, in the context of a model that is correct in relevant ways.
+    %Good estimates can---under certain assumptions---also be obtained by maximizing the cross-correlation with a spectral template that accurately represents the true stellar spectrum.
+    %If there are sufficient observations, this template can be made empirically, and still produce minimum-variance radial-velocity measurements.
+    %Cross-correlation with a binary template (which is not in itself a good model for the stellar spectrum) can also approach minimum variance if the cross-correlation is followed by a post-processing step in which a smooth model is fit to the cross-correlation function.
+    %These results justify practices in present-day data pipelines.
+    This result depends on strong assumptions; we demonstrate that if there are wavelength-calibration issues, unmodeled microtelluric features, or small spectral variations, none of the standard methods deliver minimum-variance estimates of radial velocity. 
+    We discuss approaches for weakening these assumptions in future work.
+    %The biggest limitation of this analysis is the strong assumption that the star's spectrum does not vary with time.
+    %This is demonstrably false; we discuss approaches for weakening this assumption.
 \end{abstract}
 
 \keywords{\raggedright
@@ -124,7 +133,7 @@ Spectroscopic radial-velocity measurements led to the discovery of the expansion
 dark matter (\citealt{zwicky}, \citealt{rubin}),
 and planets around other stars (\citealt{mayor}).
 They underpin the empirical basis of almost every branch of astrophysics.
-Present-day extreme-precision radial-velocity spectrographs---which now make measurements with better than meter-per-second precision (\citealt{what?})---are responsible for the discovery and characterization of thousands of extra-solar planets.
+Present-day extreme-precision radial-velocity (\EPRV) spectrographs---which make measurements with better than meter-per-second precision (\citealt{what?})---are responsible for the discovery and characterization of thousands of extra-solar planets.
 This project is motivated by the importance of these instruments and their data pipelines in exoplanet science.
 
 In the highest resolution spectrographs ($R\sim 10^5$), a change in velocity of $1\,\mps$ corresponds to a shift in spectral space of $3\times 10^{-4}$ resolution elements, or a shift on the detector of tens of \emph{atomic diameters} (\citealt{zhaophd}).
@@ -132,7 +141,7 @@ In this context, how is it possible to measure a radial velocity with better tha
 The answer to this question is long, but some of the considerations are the following:
 The best measurements are made for bright stars, for which a few minutes of exposure time can deliver a spectrum with a signal-to-noise (per resolution element) of hundreds.
 These stellar spectra will typically contain tens of thousands of useful absorption lines.
-The spectrographs are highly stabilized, and instrumented with excellent calibration sources, often observed simultaneously with the star (\citep{simultaneousreference}, \citep{gascell}).
+The spectrographs are highly stabilized, and equipped with excellent calibration sources, often observed simultaneously with the star (\citep{simultaneousreference}, \citep{gascell}).
 And, perhaps most importantly, the goal is precision, not accuracy, so the spectrographs need only measure \emph{changes} in the radial velocity at these levels.
 
 Changes in radial velocity are far easier to measure than any individual radial velocity, or even any mean radial velocity, because changes can be measured without a perfectly calibrated theoretical model of the stellar spectrum.
@@ -146,14 +155,14 @@ If the stellar spectrum doesn't vary---a strong assumption---and some other assu
 
 Whether you are a Bayesian or a frequentist, you make the best measurements by having a \emph{generative model} for your data.
 In both cases, this takes the form of a likelihood function, or a probability density for the data, evaluated at the data, parameterized by a set of parameters including your parameter of interest.
-In the Bayesian context, the likelihood function is used to update your beliefs; the posterior pdf is the prior pdf times the likelihood function (and renormalized).
+In the Bayesian context, the likelihood function is used to update your beliefs; the posterior probability density function (\pdf) is the prior \pdf\ times the likelihood function (and renormalized).
 In the frequentist context, the likelihood function can be optimized to produce bound-saturating maximum-likelihood estimates of the parameter of interest.
-In what follows, we will concentrate on the latter---information-theoretic bounds on frequentist estimators---but many of the considerations in this \documentname{} will apply also in the Bayesian setting.
+In what follows, we concentrate on the latter---information-theoretic bounds on frequentist estimators---but many of the considerations in this \documentname{} will apply also in the Bayesian setting.
 In particular, the importance of the assumptions underlying the likelihood function, and the correctness or incorrectness of those assumptions, are equally important in both statistical philosophies.
-We will give an example set of assumptions in \secref{sec:assumptions}.
+The set of assumptions at play in this particular case are laid out in \secref{sec:assumptions}.
 
-Your radial-velocity measurements are bound-saturating (minimum variance unbiased estimates) when they are maximum-likelihood estimates; we discuss this in \secref{sec:info}.
-When the likelihood function is Gaussian, or close, maximum-likelihood estimates can be found by cross-correlation with a spectral template, provided that the spectral template is a good fit to the stellar spectrum; we discuss this in \secref{sec:ccf}.
+Radial-velocity measurements are bound-saturating (minimum variance unbiased estimates) when they are maximum-likelihood estimates; this point is discussed in \secref{sec:info}.
+When the likelihood function is Gaussian, or close to it, maximum-likelihood estimates can be found by cross-correlation with a spectral template, provided that the spectral template is a good fit to the stellar spectrum; we discuss this in \secref{sec:ccf}.
 The original motivation for this \documentname{} was the observation that many radial-velocity data-analysis pipelines perform cross-correlations with a binary mask, which is manifestly \emph{not} a good fit to any stellar spectrum!
 Nonetheless, they produce good radial-velocity measurements.
 We resolve this paradox in \secref{sec:binary}; the resolution involves the post-processing of the binary-mask cross-correlation function.
@@ -178,16 +187,16 @@ These are the assumptions we will make in this project:
     All of the standard methods for measuring RVs depend critically on this assumption.
     Weakening this assumption is an extremely important research program for the future of few-$\cmps$ RV measurements, but is beyond the scope of this \documentname, except for abundant discussion.
     \item[multiple epochs]
-    We will assume that the star has been observed many times (a number much greater than one). Preferably these observations were taken on different nights, but it is really only the \emph{number} of observations that is required.
+    We will assume that the star has been observed many times ($N\gg1$). Preferably these observations were taken on different nights, but it is really only the \emph{number} of observations that is required.
     \item[well-calibrated data]
-    We will assume that the wavelength grid of the spectrograph is a consistent, correct wavelength grid in the rest frame of the spectrograph.
+    We will assume that the wavelength grid of the spectrograph is a consistent, perfectly known wavelength grid in the rest frame of the spectrograph.
     We will assume that the measured spectrum is a flux density measurement in consistent flux-density units, normalized (meaning: continuum-normalized) in a consistent way such that the normalization and calibration do not depend on time, nor do they depend on the radial velocity of the star relative to the spectrograph.
     Under these assumptions, the Doppler shift of a spectrum---or really a spectral template---is a pure translation in log wavelength. 
     \item[short exposures]
     We will assume that the exposure times are short relative to the time scales on which the radial velocity relative to the spectrograph changes.
-    This isn't precisely true for typical exposures at the present day (minutes), with precisions in the $\mps$ regime; the Earth typically accelerates (relative to the Solar System barycenter) by a few $\mps$ during a 15-minute exposure.
+    This isn't precisely true for typical exposures at the present day (minutes), with precisions in the $\cmps$ regime; the Earth typically accelerates (relative to the Solar System barycenter) by a few $\mps$ during a 15-minute exposure, but we can equivalently assume that the barycentric corrections deal properly with this effect \citep{wright, berv-lambda}.
     \item[Gaussian noise]
-    Although we will assume that the wavelength grid is precisely calibrated, so there is no significant uncertainty on the pixel wavelengths, we will assume that there is noise in the flux-density measurements, and that the noise draws are Gaussian, zero-mean, and uncorrelated.
+    Although we have assumed that the wavelength grid is precisely calibrated, so there is no significant uncertainty on the pixel wavelengths, we will assume that there is noise in the flux-density measurements, and that the noise draws are Gaussian, zero-mean, and uncorrelated.
     The uncorrelated assumption is easy to relax; we discuss that briefly in \secref{sec:info}.
     In addition to these Gaussian assumptions, we will also make the (stronger) assumption that the variance of the noise distribution is individually known at every pixel.
     We will \emph{not} assume that the noise variance is identical in every pixel; the data will be realistically heteroskedastic.
@@ -195,7 +204,7 @@ These are the assumptions we will make in this project:
     We will assume that any telluric absorption (absorption from the Earth's atmosphere), and also any interstellar absorption, or absorption in the spectrograph, does not interfere in any way with the radial-velocity measurement, either because the tellurics aren't in the spectral range we are analyzing, or they have been masked out or subtracted.
     That is, we will assume that all tellurics are known and accounted for.
     This is not true, of course, and motivates empirical projects like \wobble{} (\citealt{wobble}), to which we will return in \secref{sec:templates}.
-    \item[wavelength grid] We will make the strange (but valuable) choice of working not in spectrograph rest-frame wavelength $\lambda$ but instead the natural logarithm of the wavelength, which we will call $x$
+    \item[wavelength grid] We will make the strange (but useful) choice of working not in spectrograph rest-frame wavelength $\lambda$ but instead the natural logarithm of the wavelength, which we will call $x$:
     \begin{align}
         x &\equiv \ln\lambda ~.
     \end{align}
@@ -561,7 +570,7 @@ empirical-spectrum cross-correlation radial-velocity results in \figref{fig:empi
     \begin{center}
     \includegraphics[width=\textwidth]{../notebook/empiricalrvs.png}
     \end{center}
-    \caption{Same as the bottom panel of \figref{fig:mlrvs} but showing the results of optimizing the cross-correlation of the data with an empirical template made from the epoch data themselves. Compare with \figref{fig:ccfrvs}; this shows that empirical templates are just as good as true templates; they both saturate the information-theoretic bounds.\label{fig:empiricalrvs}}
+    \caption{Same as the bottom panel of \figref{fig:mlrvs} but showing the results of optimizing the cross-correlation of the data with an empirical template made from the epoch data themselves. Compare with \figref{fig:ccfrvs}; this shows that empirical templates are just as good as true templates; they both saturate the information-theoretic bounds. When empirical templates are used, the zero-point of the Doppler shifts becomes ambiguous; in order to make this plot, the mean of the residuals was subtracted from all of the residuals.\label{fig:empiricalrvs}}
   \end{mdframed}
 \end{figure}
 
@@ -569,9 +578,18 @@ The empirical template can be subject to issues at its edges, since each spectra
 For this reason, when we made the spectral template, we zeroed out (or really set to unity) the empirical spectra in a logarithmic wavelength range that is within $40\,\kmps$ of either edge of the template spectral range.
 Evidence of this censoring is visible in \figref{fig:empirical}.
 
-HOGG: IS THERE A BIAS WHEN YOU USE THE SPECTRUM IN ITS OWN ANALYSIS? EXPERIMENT WITH LOO. (Later: Did this; it is a very small effect at this sample size. Maybe try a smaller sample?)
+One interesting question that arises in the use of empirical templates is whether the inclusion of a particular epoch in the template biases the Doppler measurement made \emph{at that epoch}.
+In the results shown in \figref{fig:empiricalrvs} this effect was removed in the sense that each epoch's Doppler shift was obtained by cross-correlation with a template constructed from the average of all \emph{other} epochs.
+That is, the cross-correlations were with leave-one-out empirical templates.
+Experiments suggest that, for the 64-epoch toy data set here, the self-use bias is very small.
+But it might be significant when there are many fewer epochs.
 
-HOGG: Note that there is no absolute velocity here.
+In the Doppler-shift estimation methods in the previous \sectionname s, the template or likelihood was based on a theoretical model of the star.
+Thus the template can be made at zero Doppler shift (zero velocity) and the measured Doppler shift is relative to this zero.
+In the case of empirical templates, this is no longer possible.
+There is no indication or sense of the true zero of velocity (for very deep reasons!).
+In the iterative procedure used here to converge the template and the Doppler shifts, the effective zero-point of the Doppler shifts can (and does) shift.
+In making \figref{fig:empiricalrvs}, we removed this shift by setting the mean Doppler-shift residual to zero.
 
 \section{Sensitivity to assumptions}\label{sec:sensitivity}
 
