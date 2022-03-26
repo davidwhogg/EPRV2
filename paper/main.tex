@@ -1,6 +1,9 @@
 % This is part of the EPRV project 
 % Copyright 2022 the authors
 
+% on GitHub at https://github.com/davidwhogg/EPRV2
+% on Overleaf at https://www.overleaf.com/project/61d48c6072be8609b278bda7
+
 % to-do list
 % ----------
 % - Look for all instances of HOGG, BEDELL, and CITE.
@@ -8,14 +11,15 @@
 % - Be sure to discuss SNR in a continuum resolution element, as well as in a pixel.
 %.- Make sure that, for any assumption that is explicitly tested, the forthcoming test is mentioned when the assumption is introduced.
 % - Are we clear that we exponentiate the model to get the true data expectation?
-% - Are we consistent in our use of Doppler shift, radial velocity, and redshift and so on?
-% - Are we sensible in our use of first person?
-% - Do we address the relationship between our tiny spectral segment and a full spectrograph? Get scalings. Etc.
+% - Are we consistent in our use of Doppler shift, radial velocity, and redshift and so on? Fix figure captions so the figures are clearly in RV. Edit radial Doppler assumption section to say that the terms are interchangeable unless the star is moving relativistically (which it's not). cite Wright-group paper.
+% - Do we address the relationship between our tiny spectral segment and a full spectrograph? Get scalings. Etc. Possibly we should ask Daunt to give us a realistic spectral segment?
+% - Make sure we are explicit about what we are assuming that we know when we fit the CCF with a Gaussian.
 % - Make sure all figures are explicitly referred to in the text.
+% - Are we sensible in our use of first (and second?) person?
 % - I believe we are inconsistent with the tense. Always present or always past? Decide and audit / fix. Probably present is better.
-% - I think we should only measure Doppler shift, and never RV. Right??
 % - Cite Vakili et al for the parabola trick, maybe?
-% - Make the comment that the detailed noise model doesn't matter -- the CCF RVs are as good as the ML RVs.
+% - Comment on how to estimate RV uncertainties & the accuracy of those estimates for each technique?? Maybe we need a bootstrap / jackknife / multiple orders kind of discussion.
+% - Audit for being useful and concise. Maybe give better guidance to the reader. Be very clear about what's novel.
 
 \documentclass[modern]{aastex631}
 \usepackage[utf8]{inputenc}
@@ -56,6 +60,7 @@
 \newcommand{\kmps}{\km\,\s^{-1}}
 
 % Text macros
+\renewcommand{\paragraph}[1]{\bigskip\noindent\textbf{#1}~---}
 \newcommand{\project}[1]{\textsl{#1}}
 \newcommand{\wobble}{\project{wobble}}
 \newcommand{\documentname}{\textsl{Article}}
@@ -63,6 +68,10 @@
 \newcommand{\secref}[1]{\sectionname~\ref{#1}}
 \newcommand{\figref}[1]{\figurename~\ref{#1}}
 \newcommand{\foreign}[1]{\textsl{#1}}
+\newcommand{\acronym}[1]{\textsc{#1}}
+\newcommand{\EPRV}{\acronym{EPRV}}
+\newcommand{\RV}{\acronym{RV}}
+\newcommand{\pdf}{pdf} % should this be styled as a capitalized acronym?
 
 % Hogg typesetting / page layout pedantry
 \renewcommand{\twocolumngrid}{}
@@ -70,34 +79,51 @@
 \frenchspacing\raggedbottom\sloppy\sloppypar
 
 % headers and date
-\renewcommand{\today}{2022 February} % hurt me
+\renewcommand{\today}{2022 March} % hurt me
 \shorttitle{how to measure a radial velocity}
 \shortauthors{hogg {\footnotesize\&} bedell}
 \begin{document}
 
 \title{How to measure the radial velocity of a star:\\The invariant-spectrum case}
 \author[0000-0003-2866-9403]{David W. Hogg}
-\affil{The Flatiron Institute, a division of the Simons Foundation}
+\affil{Center for Computational Astrophysics, Flatiron Institute, 162 5th Avenue, New York, NY 10010}
 \affil{Center for Cosmology and Particle Physics, Department of Physics, New York University}
 
 \author[0000-0001-9907-7742]{Megan Bedell}
-\affil{The Flatiron Institute, a division of the Simons Foundation}
+\affil{Center for Computational Astrophysics, Flatiron Institute, 162 5th Avenue, New York, NY 10010}
 
 \begin{abstract}\noindent
-    Extremely precise spectroscopic measurements of radial velocity have led to the discovery and characterization of thousands of extra-solar planets.
-    Here we ask how to make the best possible radial-velocity measurements, in the sense of information theory.
-    That is, how do we make minimum-variance unbiased estimates?
-    The answer is: by adopting maximum-likelihood estimates, in the context of a model that is correct in relevant ways.
-    Maximum-likelihood estimates can---under certain assumptions---be obtained by maximizing the cross-correlation with a spectral template that accurately represents the true stellar spectrum.
-    If there are sufficient spectral measurements of the star, this template can be made empirically, and still produce minimum-variance radial-velocity measurements.
-    Cross-correlation with a binary template (which is not in itself a good model for the stellar spectrum) can approach minimum variance if the cross-correlation is followed by a post-processing step in which a smooth model is fit to the cross-correlation function.
-    These results justify practices in present-day data pipelines, but also suggest small improvements that might be important.
-    HOGG: SENTENCE ABOUT ADDING TELLURIC NOISE, CALIBRATION NOISE, SPECTRAL VARIATIONS.
-    The biggest limitation of this analysis is the strong assumption that the star's spectrum does not vary with time.
-    This is demonstrably false; we discuss approaches for weakening this assumption.
+    Extremely precise spectroscopic measurements of radial velocity (\RV) have led to the discovery and characterization of thousands of extra-solar planets.
+    This science requires not only excellent spectrograph engineering, but also the use of data-analysis methods which extract RV measurements from the observed spectra without loss of information. 
+    Here we ask how to make minimum-variance radial-velocity measurements that saturate the bounds delivered by information theory. 
+    Through this lens, we demonstrate the relative performances of several common RV extraction techniques employed by modern pipelines, including forward-modeling, cross-correlation with theoretical and empirically derived template spectra, and cross-correlation with a binary mask. 
+    We find that each of these techniques is capable of delivering minimu-variance radial-velocity measurements under certain conditions. 
+    %The answer is: by adopting maximum-likelihood estimates, in the context of a model that is correct in relevant ways.
+    %Good estimates can---under certain assumptions---also be obtained by maximizing the cross-correlation with a spectral template that accurately represents the true stellar spectrum.
+    %If there are sufficient observations, this template can be made empirically, and still produce minimum-variance radial-velocity measurements.
+    %Cross-correlation with a binary template (which is not in itself a good model for the stellar spectrum) can also approach minimum variance if the cross-correlation is followed by a post-processing step in which a smooth model is fit to the cross-correlation function.
+    %These results justify practices in present-day data pipelines.
+    This result depends on strong assumptions; we demonstrate that if there are wavelength-calibration issues, unmodeled microtelluric features, or small spectral variations, none of the standard methods deliver minimum-variance estimates of radial velocity. 
+    We discuss approaches for weakening these assumptions in future work.
+    %The biggest limitation of this analysis is the strong assumption that the star's spectrum does not vary with time.
+    %This is demonstrably false; we discuss approaches for weakening this assumption.
 \end{abstract}
 
-\keywords{foo --- bar} % HOGG
+\keywords{\raggedright
+astrostatistics~strategies
+---
+atmospheric~extinction
+---
+calibration
+---
+Fisher's~information
+---
+radial~velocity
+---
+spectroscopy
+---
+stellar activity
+}
 
 \section{Introduction}\label{sec:intro}
 
@@ -106,7 +132,7 @@ Spectroscopic radial-velocity measurements led to the discovery of the expansion
 dark matter (\citealt{zwicky}, \citealt{rubin}),
 and planets around other stars (\citealt{mayor}).
 They underpin the empirical basis of almost every branch of astrophysics.
-Present-day extreme-precision radial-velocity spectrographs---which now make measurements with better than meter-per-second precision (\citealt{what?})---are responsible for the discovery and characterization of thousands of extra-solar planets.
+Present-day extreme-precision radial-velocity (\EPRV) spectrographs---which make measurements with better than meter-per-second precision (\citealt{what?})---are responsible for the discovery and characterization of thousands of extra-solar planets.
 This project is motivated by the importance of these instruments and their data pipelines in exoplanet science.
 
 In the highest resolution spectrographs ($R\sim 10^5$), a change in velocity of $1\,\mps$ corresponds to a shift in spectral space of $3\times 10^{-4}$ resolution elements, or a shift on the detector of tens of \emph{atomic diameters} (\citealt{zhaophd}).
@@ -114,7 +140,7 @@ In this context, how is it possible to measure a radial velocity with better tha
 The answer to this question is long, but some of the considerations are the following:
 The best measurements are made for bright stars, for which a few minutes of exposure time can deliver a spectrum with a signal-to-noise (per resolution element) of hundreds.
 These stellar spectra will typically contain tens of thousands of useful absorption lines.
-The spectrographs are highly stabilized, and instrumented with excellent calibration sources, often observed simultaneously with the star (\citep{simultaneousreference}, \citep{gascell}).
+The spectrographs are highly stabilized, and equipped with excellent calibration sources, often observed simultaneously with the star (\citep{simultaneousreference}, \citep{gascell}).
 And, perhaps most importantly, the goal is precision, not accuracy, so the spectrographs need only measure \emph{changes} in the radial velocity at these levels.
 
 Changes in radial velocity are far easier to measure than any individual radial velocity, or even any mean radial velocity, because changes can be measured without a perfectly calibrated theoretical model of the stellar spectrum.
@@ -128,14 +154,14 @@ If the stellar spectrum doesn't vary---a strong assumption---and some other assu
 
 Whether you are a Bayesian or a frequentist, you make the best measurements by having a \emph{generative model} for your data.
 In both cases, this takes the form of a likelihood function, or a probability density for the data, evaluated at the data, parameterized by a set of parameters including your parameter of interest.
-In the Bayesian context, the likelihood function is used to update your beliefs; the posterior pdf is the prior pdf times the likelihood function (and renormalized).
+In the Bayesian context, the likelihood function is used to update your beliefs; the posterior probability density function (\pdf) is the prior \pdf\ times the likelihood function (and renormalized).
 In the frequentist context, the likelihood function can be optimized to produce bound-saturating maximum-likelihood estimates of the parameter of interest.
-In what follows, we will concentrate on the latter---information-theoretic bounds on frequentist estimators---but many of the considerations in this \documentname{} will apply also in the Bayesian setting.
+In what follows, we concentrate on the latter---information-theoretic bounds on frequentist estimators---but many of the considerations in this \documentname{} will apply also in the Bayesian setting.
 In particular, the importance of the assumptions underlying the likelihood function, and the correctness or incorrectness of those assumptions, are equally important in both statistical philosophies.
-We will give an example set of assumptions in \secref{sec:assumptions}.
+The set of assumptions at play in this particular case are laid out in \secref{sec:assumptions}.
 
-Your radial-velocity measurements are bound-saturating (minimum variance unbiased estimates) when they are maximum-likelihood estimates; we discuss this in \secref{sec:info}.
-When the likelihood function is Gaussian, or close, maximum-likelihood estimates can be found by cross-correlation with a spectral template, provided that the spectral template is a good fit to the stellar spectrum; we discuss this in \secref{sec:ccf}.
+Radial-velocity measurements are bound-saturating (minimum variance unbiased estimates) when they are maximum-likelihood estimates; this point is discussed in \secref{sec:info}.
+When the likelihood function is Gaussian, or close to it, maximum-likelihood estimates can be found by cross-correlation with a spectral template, provided that the spectral template is a good fit to the stellar spectrum; we discuss this in \secref{sec:ccf}.
 The original motivation for this \documentname{} was the observation that many radial-velocity data-analysis pipelines perform cross-correlations with a binary mask, which is manifestly \emph{not} a good fit to any stellar spectrum!
 Nonetheless, they produce good radial-velocity measurements.
 We resolve this paradox in \secref{sec:binary}; the resolution involves the post-processing of the binary-mask cross-correlation function.
@@ -143,7 +169,7 @@ We resolve this paradox in \secref{sec:binary}; the resolution involves the post
 Importantly for what follows, the question of having a good template can be made moot, because if the star does not substantially vary, the observations of the star themselves can be used to simultaneously produce the spectral template and the radial-velocity measurements.
 We demonstrate this to be true in \secref{sec:templates}.
 This is related to the fundamental point, above, that radial-velocity measurements are just measurements of \emph{shifts}; they don't require an \foreign{a priori} model of the spectrum.
-We discuss the visualization and checking of empirical models in \secref{sec:testing}, and return to our assumptions in the discussion in \secref{sec:discussion}.
+We look at the sensitivity to some of our most basic (and questionable) assumptions in \secref{sec:sensitivity}, and we discuss all the assumptions in more detail in the discussion in \secref{sec:discussion}.
 
 Of course the measurements of radial velocities are not interesting \emph{in themselves}.
 In the context relevant to this \documentname, radial velocities are measured in the service of discovering and characterizing extra-solar planetary systems.
@@ -160,16 +186,16 @@ These are the assumptions we will make in this project:
     All of the standard methods for measuring RVs depend critically on this assumption.
     Weakening this assumption is an extremely important research program for the future of few-$\cmps$ RV measurements, but is beyond the scope of this \documentname, except for abundant discussion.
     \item[multiple epochs]
-    We will assume that the star has been observed many times (a number much greater than one). Preferably these observations were taken on different nights, but it is really only the \emph{number} of observations that is required.
+    We will assume that the star has been observed multiple times ($N>1$). Preferably these observations were taken on different nights, but it is really only the \emph{number} of observations that is required.
     \item[well-calibrated data]
-    We will assume that the wavelength grid of the spectrograph is a consistent, correct wavelength grid in the rest frame of the spectrograph.
+    We will assume that the wavelength grid of the spectrograph is a consistent, perfectly known wavelength grid in the rest frame of the spectrograph.
     We will assume that the measured spectrum is a flux density measurement in consistent flux-density units, normalized (meaning: continuum-normalized) in a consistent way such that the normalization and calibration do not depend on time, nor do they depend on the radial velocity of the star relative to the spectrograph.
     Under these assumptions, the Doppler shift of a spectrum---or really a spectral template---is a pure translation in log wavelength. 
     \item[short exposures]
     We will assume that the exposure times are short relative to the time scales on which the radial velocity relative to the spectrograph changes.
-    This isn't precisely true for typical exposures at the present day (minutes), with precisions in the $\mps$ regime; the Earth typically accelerates (relative to the Solar System barycenter) by a few $\mps$ during a 15-minute exposure.
+    This isn't precisely true for typical exposures at the present day (minutes), with precisions in the $\cmps$ regime; the Earth typically accelerates (relative to the Solar System barycenter) by a few $\mps$ during a 15-minute exposure, but we can equivalently assume that the barycentric corrections deal properly with this effect \citep{wright, berv-lambda}.
     \item[Gaussian noise]
-    Although we will assume that the wavelength grid is precisely calibrated, so there is no significant uncertainty on the pixel wavelengths, we will assume that there is noise in the flux-density measurements, and that the noise draws are Gaussian, zero-mean, and uncorrelated.
+    Although we have assumed that the wavelength grid is precisely calibrated, so there is no significant uncertainty on the pixel wavelengths, we will assume that there is noise in the flux-density measurements, and that the noise draws are Gaussian, zero-mean, and uncorrelated.
     The uncorrelated assumption is easy to relax; we discuss that briefly in \secref{sec:info}.
     In addition to these Gaussian assumptions, we will also make the (stronger) assumption that the variance of the noise distribution is individually known at every pixel.
     We will \emph{not} assume that the noise variance is identical in every pixel; the data will be realistically heteroskedastic.
@@ -177,7 +203,7 @@ These are the assumptions we will make in this project:
     We will assume that any telluric absorption (absorption from the Earth's atmosphere), and also any interstellar absorption, or absorption in the spectrograph, does not interfere in any way with the radial-velocity measurement, either because the tellurics aren't in the spectral range we are analyzing, or they have been masked out or subtracted.
     That is, we will assume that all tellurics are known and accounted for.
     This is not true, of course, and motivates empirical projects like \wobble{} (\citealt{wobble}), to which we will return in \secref{sec:templates}.
-    \item[wavelength grid] We will make the strange (but valuable) choice of working not in spectrograph rest-frame wavelength $\lambda$ but instead the natural logarithm of the wavelength, which we will call $x$
+    \item[wavelength grid] We will make the strange (but useful) choice of working not in spectrograph rest-frame wavelength $\lambda$ but instead the natural logarithm of the wavelength, which we will call $x$:
     \begin{align}
         x &\equiv \ln\lambda ~.
     \end{align}
@@ -203,7 +229,7 @@ We will return to them at the end in \secref{sec:sensitivity} and \secref{sec:di
 
 \section{Information theory}\label{sec:info}
 
-Because data are noisy, there are limits to the precision (and accuracy\footnote{HOGG}) of any measurement that you can make with those data.
+Because data are noisy, there are limits to the precision (and accuracy) of any measurement that you can make with those data.
 The Cram\'er-Rao lower bound (CRLB; \citealt{crlb}) is a quantitative result; it says that the variance of any unbiased estimator $\widehat{\theta}$ of any quantity $\theta$ given noisy data $y$ has a variance greater than or equal to the inverse of the Fisher information $I_\theta$.
 The Fisher Information is an expectation of the second derivative of the log-likelihood function with respect to the parameter $\theta$ (\citealt{fisher}); it can only be calculated in the context of a set of assumptions sufficient to deliver a specific likelihood function.
 The CLRB is a frequentist bound, because the variance of the estimator, in this case, is the variance obtained in a hypothetical program of repeated experiments (holding everything but the noise draw fixed).
@@ -260,12 +286,19 @@ and $\dd\vf/\dd x$ is the derivative of $\vf$ with respect to the $\delta x$ arg
 
 These expressions \eqref{eq:ivar} and \eqref{eq:ivar2} for the inverse variance $1/\sigma_x^2$ are extremely simple, but also extremely important for experimental design.
 They deliver---implicitly---expectations for (best possible) radial-velocity precision as a function of stellar spectral type, spectrograph resolution, spectral coverage, and signal-to-noise, because these inputs affect the expectations for the template $f(x)$, the noise variances $\sigma_i^2$, and the number of pixels $n$.
-These expressions are not new; many related expressions appear in the literature:
-HOGG: How are these uncertainty formulae related to formulae in the literature? HOGG: MOVE HERE FROM THE EPRV DOC.
+
+Expression \eqref{eq:ivar} is not new; many related expressions appear in the literature.
+Most of the expressions in the literature make the same assumptions we make in \secref{sec:assumptions}, and some make additional more restrictive assumptions:
+Butler (\citealt{Butler}) shows essentially the expression \eqref{eq:ivar}.
+Bouchy (\citealt{Bouchy}) shows an expression that assumes that the pixels are independent and that the noise is dominated by a combination of photon and read noise. 
+That work also replaces the model spectrum with a set of optimal weights for cross-correlation, which amounts to very much the same thing, as we will discuss below.
+Figueira (\citealt{figuera}) and (others CITE) show a per-line bound, based on assumptions similar to those of Bouchy but with the additional assumption that each line is well approximated by a Gaussian (squared exponential) in shape.
+These literature bounds are all extremely similar, and similar to \eqref{eq:ivar}; nothing here is controversial.
+The only thing that is new to the precision radial-velocity literature is the generalization \eqref{eq:ivar2} to noise models with pixel-to-pixel covariances.
 
 \section{Toy data}\label{sec:data}
 
-In order to test the maximum-likelihood estimator and the estimators to follow, we build a sandbox of completely fake data with known properties, obeying our assumptions.
+In order to test the maximum-likelihood estimator and the estimators to follow, we build a sandbox of completely fake toy data with known properties, obeying our assumptions.
 \figref{fig:data} shows a few example spectra generated from our model.
 The model spectra are made with an exactly unit continuum and a set of discrete absorption lines of varying equivalent widths.
 The lines are drawn from a uniform Poisson process in the long-wavelength $x$ domain.
@@ -304,17 +337,18 @@ In small spectral segments, the noise variance (for a bright star) is proportion
 And indeed, our toy-data simulations span only a small spectral segment.
 Importantly, with these toy-data assumptions, we can generate toy data, compute information-theoretic bounds, and test different kinds of radial-velocity estimators.
 
-One detail about our these toy data is that although when we generate the noise we use a variance that depends on the true flux expectation, the observer of these data never gets to see that expectation directly.
+One detail about these toy data is that although when we generate the noise we use a variance that depends on the true flux expectation, the observer of these data never gets to see that expectation directly.
 For this reason, we produce two different noise variance estimates at every pixel:
 One is the true noise variance that is related to the true flux expectation and that was used to generate the noise in that pixel.
 The other is an empirical noise variance estimate that is based on the observed (noisy) flux in that pixel.
-These two noise variances are very similar except for the faintest pixels---that is, the pixels in the centers of strong absorption lines.
+These two noise variances are very similar except in the faintest pixels---that is, the pixels in the centers of strong absorption lines.
 In what follows, we use the true noise variances to estimate the information-theoretic bounds.
 We use the empirical noise variances in the log-likelihood function (or chi-squared function $\chi^2$) that is used to produce the maximum-likelihood radial-velocity estimates.
 
-\figref{fig:mlrvs} shows the true radial velocities for the XXX epochs of toy data, the maximum-likelihood radial velocities found by minimizing $\chi^2$ \eqref{eq:chi2}, the residuals, and the information-theoretic (Cram\'er--Rao) bound \eqref{eq:CRLB} derived from the inverse of the Fisher information \eqref{eq:fisher}.
+\figref{fig:mlrvs} shows the true radial velocities for the 64 epochs of toy data, the maximum-likelihood Doppler shifts found by minimizing $\chi^2$ \eqref{eq:chi2}, the residuals, and the information-theoretic (Cram\'er--Rao) bound \eqref{eq:CRLB} derived from the inverse of the Fisher information \eqref{eq:fisher}.
 In detail, to obtain these radial-velocity estimates the $\chi^2$ function made use of a stellar template, and here we used the exactly correct template; we used the template that was used to generate the toy data in the first place.
 This figure shows, as expected, that with this use of a perfect template, the minimum-$\chi^2$ radial-velocity estimates, which are maximum-likelihood estimates, saturate the information-theoretic bound.
+In \secref{sec:sensitivity}, cross-correlation with a slightly wrong template delivers Doppler shifts that don't saturate the bound.
 
 \begin{figure}[tp]
   \begin{mdframed}
@@ -325,12 +359,10 @@ This figure shows, as expected, that with this use of a perfect template, the mi
     \caption{Demonstration that maximum-likelihood estimates saturate the information-theoretic bound.
     The top panel shows both the true doppler shifts for the 64 epochs of toy data and the maximum-likelihood estimates.
     The bottom panel shows the residuals (estimate minus true) as a function of true doppler shift.
-    In the bottom panel, the thin red lines indicate the Cram\'er--Rao lower bound on the root-variance (the square-root of the inverse of the Fisher information), and the thick grey lines indicate the empirical central 68-percent region (the empirical one-sigma region).
+    In the bottom panel, the thin red lines indicate the Cram\'er--Rao lower bound on the root-variance (the square-root of the inverse of the Fisher information), and the thick grey lines indicate the 16th and 84th percentiles of the residuals (the empirical one-sigma region).
     The fact that the thin red lines overlap the thick grey lines shows that the maximum-likelihood estimates saturate the information-theoretic bound, as expected.\label{fig:mlrvs}}
   \end{mdframed}
 \end{figure}
-
-HOGG: Maybe show that the wrong template (like missing some lines) gives less-good RVs?? Or move this to \secref{sec:sensitivity}??
 
 \section{Cross-correlation}\label{sec:ccf}
 
@@ -370,7 +402,12 @@ Thus it is imperative that the template be renormalized at every Doppler shift b
     f(x_i-\delta x) &\leftarrow f(x_i-\delta x)\,\left[\sum_{i=1}^n \frac{[f(x_i-\delta x)]^2}{\sigma_i^2}\right]^{-1/2} ~.
 \end{align}
 With this Doppler-shift-dependent normalization, the auto-correlation term in the expansion \eqref{eq:chi2ccf} becomes precisely constant with $\delta x$.
-This might seem like a detail, but in our toy-data example, failure to renormalize in this manner introduces structured scatter in the radial-velocity estimates far in excess of the information-theoretic bound.
+This might seem like a detail, but in our toy-data example, failure to renormalize in this manner introduces structured scatter in the radial-velocity estimates far in excess of the information-theoretic bound. 
+
+A variation of this effect in action may be seen in the HARPS spurious one-year signals diagnosed by \citet{Dumusque2015}, where the seasonal barycentric shifts of certain spectral features in and out of CCD stitching boundaries on the HARPS detector effectively introduced a seasonal variability to the normalization. 
+This is a subtle case in which the the lines are not actually leaving the wavelength domain of the data, but instead are moving through a wavelength region that is affected by quantum efficiency (QE) variations. 
+Ideally this effect would be encoded in the uncertainty $\sigma_i$ of the pixels known to be affected by QE variations.
+(HOGG \& BEDELL discuss this paragraph!)
 
 Many data pipelines do a simple unweighted cross-correlation, not weighted by the inverse pixel variances $1/\sigma_i^2$ (nor the inverse covariance matrix $\vC^{-1}$).
 Technically maximization of the simple unweighted cross-correlation function is not equivalent, but for much of the spectrum, it won't be very different, because much of the spectrum has uncertainties that lie in a reasonably low dynamic-range band, for the most part.
@@ -409,23 +446,23 @@ A full description of this is out of scope, but we show one particular example b
 \section{Binary mask magic}\label{sec:binary}
 
 In this \sectionname{} we discuss a technical matter relevant to present-day radial-velocity pipelines.
-This point is not important to our main information-theory thread, but is relevant to understand why present-day pipelines work well.
+This point is a slight digression to the main information-theory thread, but it is relevant to understand why present-day pipelines work well.
 
 We demonstrated, above, that maximum-likelihood or cross-correlation with a good spectral template leads to information-theoretic optimal estimates of radial velocity.
-That's important.
-However, most present-day operating instrument pipelines (CITE) in fact the extracted spectrum is instead cross-correlated with a \emph{binary mask}.
-This is a function that is unity in some wavelength regions, and zero in most of the rest, typically unity in significant stellar absorption lines and zero outside the lines, or in the vicinity of strong telluric absorption.
-There is no way that the cross-correlation with this template can directly deliver radial velocities that saturate any bounds!
-And yet pipelines \emph{do} produce excellent estimates of radial velocity.
+However, in many present-day operating instrument pipelines (CITE) in fact the extracted spectrum is instead cross-correlated with a \emph{binary mask}.
+This is a function with values somewhere between zero and one in small wavelength regions that correspond to a select subset of stellar absorption lines, and values of zero at all other wavelengths. 
+It is far from obvious that this method, which appears to `fit' a spectrum with an extremely un-spectrum-like function, should deliver radial velocities that saturate any bounds!
+And yet binary mask based pipelines \emph{do} produce excellent estimates of radial velocity.
 
-What gives?
-First of all, because the binary mask, in some sense, indicates the \emph{negative} of the absorption, the cross-correlation is more-or-less \emph{minimized} at the correct radial velocity, not maximized.
-Second of all, the way the cross-correlation is used, in these pipelines, is not that it is directly minimized, but instead the dip in the cross-correlation function is \emph{fit with a smooth model} (usually an inverted Gaussian function).
-The radial-velocity measurement is then derived from the offset of the best-fit Gaussian to the binary-mask cross-correlation function.
-In a miracle worthy of the name, this procedure is functionally equivalent to convolving the binary mask with a Gaussian---thus making a reasonably good template for the spectrum---and then optimizing the cross-correlation of the data with that good (no longer binary) template.
+How can we understand this?
+One thing to note: because the binary mask, in some sense, indicates the \emph{negative} of the absorption, the cross-correlation is more-or-less \emph{minimized} at the correct radial velocity, not maximized.
+Secondly, the way the cross-correlation is used in these pipelines is not that it is directly minimized, but instead the dip in the cross-correlation function is \emph{fit with a smooth model} (usually an inverted Gaussian function).
+The radial-velocity measurement is then derived as the best-fit Gaussian mean.
+This procedure is functionally equivalent to convolving the binary mask with a Gaussian---thus making a reasonably good template for the spectrum---and then optimizing the cross-correlation of the data with that good (no longer binary) template. 
+Importantly, the order of operations in the standard binary mask procedure means that the equivalent Gaussian convolution is done with the optimal Gaussian for the observed spectrum.
 In what follows, we demonstrate this quantitatively.
 
-Imagine that you have a binary mask function $\beta(x)$ with the beautiful property that if you smooth it with some smooth line-spread function $\psi(x-x')$ it becomes a reasonable model template $y(x)$ for the deviation of the spectrum from the continuum.
+Imagine that you have a binary mask function $\beta(x)$ with the beautiful property that if you smooth it with some line-spread function $\psi(x-x')$ it becomes a reasonable model template $y(x)$ for the deviation of the spectrum from the continuum.
 Think of the binary mask as being (effectively) an absorption line list, with the width of each binary line in the binary mask corresponding to the equivalent width the line has in the spectrum.
 Then convolution with a model $\psi(x-x')$ of the line-spread function will give a model for the finite-resolution spectrum.
 That is, imagine that we have a binary mask $\beta(x)$ and kernel function $\psi(x-x')$ such that
@@ -450,7 +487,8 @@ In equations (HOGG SAYS: I THINK THERE'S a sign error here):
 where $\CCF(\delta; f)$ is the cross-correlation of the data with the template $f$ at (pixel level) Doppler shift $\delta$,
 $\CCF(\delta, \beta)$ is the same but for the binary mask $b$,
 and in the final step we use the above-mentioned fact that maximization of a cross-correlation is equivalent to minimization of a $\chi^2$.
-Thus even though optimization of the binary-mask cross-correlation function $\CCF(\delta; b)$ would not come close to saturating the information-theoretic bounds on the measurement of the Doppler shift, least-square fitting of that cross-correlation function with a model of the line-spread function will come close to saturating it.
+Thus even though optimization of the binary-mask cross-correlation function $\CCF(\delta; b)$ would not come close to saturating the information-theoretic bounds on the measurement of the Doppler shift, least-square fitting of that cross-correlation function with a model of the line-spread function will come close to saturating it. 
+It is necessary that the entire CCF should be fit with the line-spread function to extract maximum information; the parabola trick discussed in \secref{sec:ccf} will produce very noisy estimates here!
 
 In this \sectionname{} we are being a bit loose with the sums over pixels $i$:
 Because the binary mask involves very fine structure in the $x$ space, in practice these sums must either be performed on a very fine pixel grid (much finer than natural extraction grids for real spectrographs), or else the data must be interpolated onto the features of the binary mask.
@@ -458,7 +496,7 @@ In practice most real pipelines do the latter, we believe.
 The binary-mask cross-correlations we compute here (below) are computed by interpolating (with a cubic spline interpolator) the data $y_i$ onto the non-zero parts of the binary mask and then integrating over the small binary-mask windows.
 
 In the toy-data system, we made the binary mask by processing the list of true line locations and true line equivalent widths that was used to make the true spectral expectation (\secref{sec:data}).
-The binary mask is set to zero everywhere except in a set of non-zero windows, one centered on each true line above an equivalent width limit of HOGG WHAT.
+The binary mask is set to zero everywhere except in a set of non-zero windows, one centered on each true line above an equivalent width limit of $10^{-6}$ in ln-wavelength units.
 Each window gets a width that is $1/4$ of the true line equivalent width.
 Windows are deleted if they are within Doppler shifts of $\pm 40\,\kmps$ of either edge of the observed spectral range, so that there are no difficult edge effects (at some loss of spectral features).
 Windows that overlap are combined by adopting width-weighted average locations and adding the widths.
@@ -507,7 +545,12 @@ The spectral template $f(x)$ can be derived directly from the observations of th
 The requirement here is that there be substantial numbers of epochs of observations, sufficient to provide an estimate of the mean spectrum that is (much) higher in signal-to-noise than the spectral data at any individual epoch.
 This realization is the fundamental motivation for the \wobble{} project (\citealt{wobble}).
 
-HOGG: Quantitative argument using SNR and scalings.
+There is a simple argument about the quality of empirical templates that goes as follows:
+Imagine that you have $N$ epochs of observation of a star, all with the same spectrograph, and each of these observations is at similar signal-to-noise ratio.
+If the star does not vary epoch-to-epoch, an empirical spectral template will accurately describe the spectrum of the star in this spectrograph (by assumption and construction), and it will have a signal-to-noise ratio that is on the order of $\sqrt{N}$ larger than the signal-to-noise of any individual epoch.
+The use of the empirical template will add in quadrature to any individual-epoch Doppler-shift uncertainty a template-origin uncertainty that is smaller by a factor of $\sqrt{N}$.
+Once $N$ is large enough---and because this additional noise adds only in quadrature---the empirical template ought to be as good (or better, since a certain kind of accuracy is guaranteed) as any theoretical spectral template for the determination of Doppler shifts.
+In the toy data we use here (\secref{sec:data}), $N=64$.
 
 Empirical templates can be created by interpolating spectra to a common logarithmic wavelength grid and averaging.
 Interpolations wwre performed with cubic splines.
@@ -532,45 +575,72 @@ empirical-spectrum cross-correlation radial-velocity results in \figref{fig:empi
     \begin{center}
     \includegraphics[width=\textwidth]{../notebook/empiricalrvs.png}
     \end{center}
-    \caption{Same as the bottom panel of \figref{fig:mlrvs} but showing the results of optimizing the cross-correlation of the data with an empirical template made from the epoch data themselves. Compare with \figref{fig:ccfrvs}; this shows that empirical templates are just as good as true templates; they both saturate the information-theoretic bounds.\label{fig:empiricalrvs}}
+    \caption{Same as the bottom panel of \figref{fig:mlrvs} but showing the results of optimizing the cross-correlation of the data with an empirical template made from the epoch data themselves. Compare with \figref{fig:ccfrvs}; this shows that empirical templates are just as good as true templates; they both saturate the information-theoretic bounds. When empirical templates are used, the zero-point of the Doppler shifts becomes ambiguous; in order to make this plot, the mean of the residuals was subtracted from all of the residuals.\label{fig:empiricalrvs}}
   \end{mdframed}
 \end{figure}
 
-HOGG: Note the sensitivity to edge effects.... How did we deal with that?
+The empirical template can be subject to issues at its edges, since each spectral epoch reveals a slightly different stellar rest-frame spectral range in a spectrograph of fixed spectrograph-frame spectral range.
+For this reason, when we made the spectral template, we zeroed out (or really set to unity) the empirical spectra in a logarithmic wavelength range that is within $40\,\kmps$ of either edge of the template spectral range.
+Evidence of this censoring is visible in \figref{fig:empirical}.
 
-HOGG: IS THERE A BIAS WHEN YOU USE THE SPECTRUM IN ITS OWN ANALYSIS? EXPERIMENT WITH LOO. (Later: Did this; it is a very small effect at this sample size. Maybe try a smaller sample?)
+One interesting question that arises in the use of empirical templates is whether the inclusion of a particular epoch in the template biases the Doppler measurement made \emph{at that epoch}.
+In the results shown in \figref{fig:empiricalrvs} this effect was removed in the sense that each epoch's Doppler shift was obtained by cross-correlation with a template constructed from the average of all \emph{other} epochs.
+That is, the cross-correlations were with leave-one-out empirical templates.
+Experiments suggest that, for the 64-epoch toy data set here, the self-use bias is very small.
+But it might be significant when there are many fewer epochs.
 
-HOGG: Note that there is no absolute velocity here.
+In the Doppler-shift estimation methods in the previous \sectionname s, the template or likelihood was based on a theoretical model of the star.
+Thus the template can be made at zero Doppler shift (zero velocity) and the measured Doppler shift is relative to this zero.
+In the case of empirical templates, this is no longer possible.
+There is no indication or sense of the true zero of velocity (for very deep reasons!).
+In the iterative procedure used here to converge the template and the Doppler shifts, the effective zero-point of the Doppler shifts can (and does) shift.
+In making \figref{fig:empiricalrvs}, we removed this shift by setting the mean Doppler-shift residual to zero.
 
 \section{Sensitivity to assumptions}\label{sec:sensitivity}
 
 We opened (\secref{sec:assumptions}) with a long list of restrictive assumptions.
 Here we perform experiments in which we make the data weakly incompatible with some of these assumptions and look at how the radial-velocity measurements are affected.
+These experiments are not intended to exhaustively test any of the assumptions; they are just demonstrations that the assumptions do indeed matter.
 
-\noindent
-\paragraph{Wavelength calibration issues}
-In \secref{sec:assumptions} and everything else above, we assumed that...HOGG
+\paragraph{Wavelength-calibration issues}
+As stated in \secref{sec:assumptions}, in everything above we assumed that the spectra are perfectly calibrated in a wavelength sense.
+This means that every extracted spectral pixel $i$ has an accurate associated logarithmic wavelength value $x_i$.
+In practice, the wavelengths of the extracted pixels are themselves noisy measurements based on noisy calibration data, and thus this assumption must be wrong in detail.
+In addition to the noise in calibration data, there can also be wavelength-calibration issues because detectors are real devices with non-uniformities in their pixel positions (see, for example, \citealt{excalibur}); these non-uniformities are not captured in all calibration methods.
 
-HOGG: Refer to \figref{fig:calibration}
+In order to explore wavelength-calibration issues, we make data as per \secref{sec:data} but instead of having the data on a regular wavelength grid, we perturb the wavelength grid with a sinusoidal perturbation.
+This perturbation is sinusoidal in $x$, has exactly zero mean $x$ shift, and is different in amplitude for every epoch.
+The perturbations have amplitudes on the order of 0.1~pixels, peak-to-peak.
+Doppler shifts are measured in these distorted toy spectral data using the template cross-correlation as in \secref{sec:ccf}.
+
+The results are shown in \figref{fig:calibration}, which can be compared to the baseline results shown in \figref{fig:ccfrvs}.
+The wavelength perturbations increase the empirical scatter in the measurements, such that they no longer saturate the information-theoretic bound.
+It is interesting to note that this systematic wavelength-calibration noise contaminates the Doppler-shift measurements despite the fact that the introduced noise has, in itself, no net or mean shift in the logarithmic-wavelength $x$ space.
 
 \begin{figure}[tp]
   \begin{mdframed}
     \begin{center}
     \includegraphics[width=\textwidth]{../notebook/calibration.png}
     \end{center}
-    \caption{Same as \figref{fig:ccfrvs} but now showing cross-correlation results after systematic wavelength-calibration issues are introduced. THe calibration issues are below the one-thousandth-of-a-pixel level and have no net Doppler shift (see text).\label{fig:calibration}}
+    \caption{Same as \figref{fig:ccfrvs} but now showing cross-correlation results after systematic wavelength-calibration issues are introduced. The calibration issues are below the one-thousandth-of-a-pixel level and have no net Doppler shift (see text).\label{fig:calibration}}
   \end{mdframed}
 \end{figure}
 
-\noindent
 \paragraph{Unmodeled low-amplitude telluric lines}
-In \secref{sec:assumptions} and everything else above, we assumed that telluric lines either don't exist, or else are handled properly.
+As stated in \secref{sec:assumptions}, in everything above we assumed that telluric lines either don't exist, or else are handled properly.
 Telluric lines can be handled by fitting and subtracting them, or by masking the data at their locations.
 However, it is possible for there to be tiny, unknown telluric features that affect the data but aren't either known or individually detectable.
-(HOGG COMMENT that wobble can handle these!)
-Here we test the sensitivity to this assumption by adding in HOGG WHAT AND HOW?
+The possible existence of these lines was one of the motivations for the \textsl{wobble} project (\citealt{wobble)}.
 
-HOGG: Refer to \figref{fig:telluric}.
+Here we test the sensitivity to unmodeled telluric contamination by creating a substantial number of very low amplitude absorption lines and combining them into a telluric template, much as we create the spectral template above in \secref{sec:data}.
+The telluric template created this way is shown in \figref{fig:telluric}.
+It only contains low-amplitude variations that would not be clearly visible at any epoch.
+The spectral data are multiplied by this telluric template to (approximately) simulate contamination by weak telluric lines.
+Importantly, although the spectral data are at different Doppler shifts relative to the spectrograph wavelength grid, the telluric component is always at zero Doppler shift because it is assumed to be fixed with respect to the atmosphere, which is assumed to be fixed relative to the spectrograph.
+
+Doppler shifts are measured in these telluric-contaminated data using the template cross-correlation as in \secref{sec:ccf}.
+The results are shown in  \figref{fig:telluric}, which can be compared to the baseline results shown in \figref{fig:ccfrvs}.
+The introduction of telluric contamination increases the empirical scatter in the measurements, such that they no longer saturate the information-theoretic bound.
 
 \begin{figure}[tp]
   \begin{mdframed}
@@ -582,32 +652,56 @@ HOGG: Refer to \figref{fig:telluric}.
   \end{mdframed}
 \end{figure}
 
-\noindent
 \paragraph{Small spectral variations}
-In \secref{sec:assumptions} and everything else above, we assumed that...HOGG
+As stated in \secref{sec:assumptions} (and even our title), in everything above we assumed that the star is non-variable. That is, the only differences from epoch to epoch are the Doppler shift and the photon noise.
+There are no variations in spectral shape, line strengths, line positions, line-spread function, or line ratios.
+Performing good Doppler-shift measurement in the presence of arbitrary spectral variability is out of scope here; it is the subject of an important future line of research.
+Here we just look at one simple kind of variability: Variable line strengths.
 
-HOGG: Refer to \figref{fig:variable}.
+Variable spectral data are made as in \secref{sec:data} but instead of using the identical spectral template for every simulated epoch, the equivalent widths of the lines are varied fractionally by small fractions such that there is a one-percent scatter in the line equivalent widths.
+Everything else about the data generation is left unchanged.
+These spectral variations do not involve moving any lines to shorter or longer wavelengths, they only involve the line \emph{strengths}.
+
+Doppler shifts are measured in these toy time-variable spectral data using the template cross-correlation as in \secref{sec:ccf}.
+The results are shown in \figref{fig:variable}, which can be compared to the baseline results shown in \figref{fig:ccfrvs}.
+The line-strength variations increase the empirical scatter in the measurements, such that they no longer saturate the information-theoretic bound.
+This demonstration can also be seen as a demonstration that cross-correlation with a slightly-wrong spectral template will not saturate the information-theoretic bound.
+It is interesting to note that this toy spectral variability contaminates the Doppler-shift measurements despite the fact none of the spectral lines is moved in wavelength.
 
 \begin{figure}[tp]
   \begin{mdframed}
     \begin{center}
     \includegraphics[width=\textwidth]{../notebook/variable.png}
     \end{center}
-    \caption{Same as \figref{fig:ccfrvs} but now showing cross-correlation results after spectral variability is introduced. The variability is at the percent level in equivalent widths, only in the line equivalent widths, and not at all in line locations (see text).\label{fig:variable}}
+    \caption{Same as \figref{fig:ccfrvs} but now showing cross-correlation results after spectral variability is introduced. The variability is at the percent level in equivalent widths, only in the line equivalent widths, and not at all in line locations (see text). Nonetheless, the Doppler shift e\label{fig:variable}}
   \end{mdframed}
 \end{figure}
 
 \section{Discussion}\label{sec:discussion}
 
-HOGG: Return to the assumptions and discuss them at least briefly, and what happens if you want to weaken them.
+HOGG: What, roughly, is most important about the above?
+
+- Info theory precision result. Contextualize with existing formulations. All is well here.
+
+- Do different methods saturate this bound? Yes, yes they can and do; we have choices.
+
+- Under conditions, the in-practice binary-mask method is a good method; that is, current pipelines probably do saturate the bound. BUT this result depends on strong assumptions (list here!); we elucidate that. mask convolved with gaussian is good; line EWs; LSF; etc.
+
+- We don't test all our myriad assumptions, but the ones we do test appear to be significant; there is a possible full flow-down. Cite Halverson here.
+
+HOGG: How do our quantitative results on our toy data relate to quantitative results on a real star? It's complicated because it depends on the real lines and the spectral coverage (and resolution and so on).
+
+HOGG: Do any of the assumptions change in the face of new technology, new spectrographs, etc? Discuss them at least briefly, and what happens if you want to weaken them. Ground vs space? Cite NASA peeps.
+
+Contextualize this work in general RV science (beyond EPRV): What about ACCURATE RV?? What about single-epoch? What about low-R spectrographs? (Call out Gaia here!?) 
 
 HOGG: In the above, make sure to comment on the conceptual point of whether you are measuring a velocity wrt the spectrograph, or a velocity wrt the Solar-System barycenter (as EXPRES does). This distinction is important to the design of extraction pipelines, but doesn't change any of our story here.
 
-HOGG: Do the time-invariant spectrum assumption last and discuss the different possible approaches to this problem.
+HOGG: Do the time-invariant spectrum assumption last and discuss the different possible approaches to this problem. Many of these are being pursued! Cite everyone.
 
 \software{
-\project{numpy} \citep{numpy};
-\project{matplotlib} \citep{matplotlib}
+\project{numpy} \citep{numpy} ---
+\project{matplotlib} \citep{matplotlib} ---
 \project{scipy} \citep{scipy}
 }
 
@@ -615,6 +709,7 @@ HOGG: Do the time-invariant spectrum assumption last and discuss the different p
 It is a pleasure to thank
   Jacob Bean (Chicago),
   John Brewer (Yale),
+  Matthew Daunt (NYU),
   Dan Foreman-Mackey (Flatiron),
   Ben Montet (Chicago),
   Adrian Price-Whelan (Flatiron),
@@ -629,6 +724,7 @@ for hospitality during a critical phase of this project.
 \begin{thebibliography}{dummy}
   \bibitem[Bedell et al.(2019)]{wobble} Bedell, M., Hogg, D.~W., Foreman-Mackey, D., et al.\ 2019, \aj, 158, 164. doi:10.3847/1538-3881/ab40a7
   \bibitem[Blackman et al.(2019)]{berv-lambda} Blackman, R.~T., Ong, J.~M.~J., \& Fischer, D.~A.\ 2019, \aj, 158, 40. doi:10.3847/1538-3881/ab24c3
+  \bibitem[Dumusque et al.(2015)]{Dumusque2015} Dumusque, X., Pepe, F., Lovis, C., et al.\ 2015, \apj, 808, 171. doi:10.1088/0004-637X/808/2/171
   \bibitem[Harris et al.(2020)]{numpy} Harris, C.~R., Millman, K.~J., van der Walt, S.~J., et al.\ 2020, \nat, 585, 357. doi:10.1038/s41586-020-2649-2
   \bibitem[Hubble(1929)]{hubble} Hubble, E.\ 1929, Proceedings of the National Academy of Science, 15, 168. doi:10.1073/pnas.15.3.168
   \bibitem[Hunter(2007)]{matplotlib} Hunter, J.~D.\ 2007, Computing in Science and Engineering, 9, 90. doi:10.1109/MCSE.2007.55
@@ -636,6 +732,7 @@ for hospitality during a critical phase of this project.
   \bibitem[Rubin et al.(1980)]{rubin} Rubin, V.~C., Ford, W.~K., \& Thonnard, N.\ 1980, \apj, 238, 471. doi:10.1086/158003
   \bibitem[Virtanen et al.(2020)]{scipy} Virtanen, P., Gommers, R., Oliphant, T.~E., et al.\ 2020, Nature Methods, 17, 261. doi:10.1038/s41592-019-0686-2
   \bibitem[Zhao(2021)]{zhaophd} Zhao, L.~L., 2021, PhD dissertation, Yale University
+  \bibitem[Zhao et al.(2021)]{excalibur} Zhao, L.~L., Hogg, D.~W., Bedell, M., et al.\ 2021, \aj, 161, 80. doi:10.3847/1538-3881/abd105
   \bibitem[Zwicky(1933)]{zwicky} Zwicky, F.\ 1933, Helvetica Physica Acta, 6, 110
 \end{thebibliography}
 
