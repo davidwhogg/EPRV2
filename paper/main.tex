@@ -80,12 +80,14 @@
 \frenchspacing\raggedbottom\sloppy\sloppypar
 
 % headers and date
-\renewcommand{\today}{2022 March} % hurt me
+\renewcommand{\today}{2022 July} % hurt me
 \shorttitle{how to measure a radial velocity}
 \shortauthors{hogg {\footnotesize\&} bedell}
 \begin{document}
 
-\title{How to measure the radial velocity of a star:\\The invariant-spectrum case}
+\title{How to measure the radial velocity of a star}%:\\The invariant-spectrum case}
+% HOGG: do you agree with this title change?
+% Reasoning is (a) we do discuss the effects of spectral variability & (b) we shouldn't imply there will be a follow-up...
 \author[0000-0003-2866-9403]{David W. Hogg}
 \affil{Center for Computational Astrophysics, Flatiron Institute, 162 5th Avenue, New York, NY 10010}
 \affil{Max-Planck-Institut f\"ur Astronomie, K\"onigstuhl 17, D-69117 Heidelberg, Germany}
@@ -97,9 +99,9 @@
 \begin{abstract}\noindent
     Extremely precise spectroscopic measurements of radial velocity (\RV) have led to the discovery and characterization of thousands of extra-solar planets.
     This science requires not only excellent spectrograph engineering, but also the use of data analysis methods that extract RV measurements from the observed spectra without loss of information. 
-    Here we ask how to make minimum-variance radial velocity measurements that saturate the bounds delivered by information theory. 
+    Here we ask how to make radial velocity measurements that reach the bounds on precision set by information theory. 
     Through this lens, we demonstrate the relative performances of several common RV extraction techniques employed by modern pipelines, including forward-modeling, cross-correlation with theoretical and empirically derived template spectra, and cross-correlation with a binary mask. 
-    We find that each of these techniques is capable of delivering minimum-variance radial velocity measurements under certain conditions. 
+    We show that each of these techniques is capable of delivering minimum-variance radial velocity measurements under distinct conditions. 
     This result depends on strong assumptions; we demonstrate that if there are wavelength calibration issues, unmodeled microtelluric features, or small spectral variations, none of the standard methods deliver minimum-variance estimates of radial velocity. 
     We discuss approaches for weakening these assumptions in future work.
 \end{abstract}
@@ -125,7 +127,7 @@ stellar activity
 A large fraction of contemporary astrophysics is built on the spectroscopic measurement of radial velocities.
 Spectroscopic radial-velocity measurements led to the discovery of the expansion of the Universe (\citealt{hubble}),
 dark matter (\citealt{zwicky}, \citealt{rubin}),
-and planets around other stars (\citealt{mayor}).
+and planets around other Sun-like stars (\citealt{mayor}).
 They underpin the empirical basis of almost every branch of astrophysics.
 Present-day extreme-precision radial-velocity (\EPRV) spectrographs---which make measurements with better than meter-per-second precision (\citealt{what?})---are responsible for the discovery and characterization of thousands of extra-solar planets.
 This project is motivated by the importance of these instruments and their data pipelines in exoplanet science.
@@ -137,22 +139,37 @@ The best measurements are made for bright stars, for which a few minutes of expo
 These stellar spectra will typically contain tens of thousands of useful absorption lines.
 The spectrographs are highly stabilized, and equipped with excellent calibration sources, often observed simultaneously with the star (\citealt{simultaneousreference}, \citealt{gascell}).
 And, perhaps most importantly, the goal is precision, not accuracy, so the spectrographs need only measure \emph{changes} in the radial velocity at these levels.
+Regardless, it is clear that making such a precise radial velocity measurement is a challenging feat, and the data analysis methods employed are worthy of careful consideration.
 
-Strictly speaking, there is no stellar-theory-independent measurement of any single radial velocity, because the radial velocity measurement is a measurement of the difference between the observed and true (rest-frame) wavelengths of particular absorption lines, which are produced by non-trivial models of stellar atmospheres.
-But \emph{changes in time} of the radial velocity of a star can be measured with almost no input of the theory of stellar atmospheres.
-This is because the changes from epoch to epoch shift the spectrum straightforwardly.
-The shift can be measured even without any physical model for the true rest-frame spectrum.
-If the stellar spectrum doesn't vary---a strong assumption---and some other assumptions about the noise are valid, then changes in radial velocity can be measured with unlimited accuracy, in the sense that the measurements should just get better linearly with the total signal-to-noise in the data set.
+This \documentname{} is not intended as a review of the field, and will certainly not be exhaustive in its overview of data analysis techniques \citep[for the interested reader, we refer instead to the review by][]{Ford2022}. 
+We aim instead to put forward a framework for thinking about radial velocity measurement precision in the context of the information content of the data. 
+Within this framing, we can assess through toy-model experiments the relative performances for a few common approaches to RV measurement.
 
-Whether you are a Bayesian or a frequentist, you make the best measurements by having a \emph{generative model} for your data.
-In both cases, this takes the form of a likelihood function, or a probability density for the data, evaluated at the data, parameterized by a set of parameters including your parameter of interest.
-In the Bayesian context, the likelihood function is used to update your beliefs; the posterior probability density function (\pdf) is the prior \pdf\ times the likelihood function (and renormalized).
-In the frequentist context, the likelihood function can be optimized to produce bound-saturating maximum-likelihood estimates of the parameter of interest.
-In what follows, we concentrate on the latter---information-theoretic bounds on frequentist estimators---but many of the considerations in this \documentname{} will apply also in the Bayesian setting.
+Using information theory, we can generate quantitative predictions for the best achievable constraints on an unknown quantity given the properties of observable data and a set of assumptions about the system being modeled.
+The assumptions being made are particularly important, and we begin by laying them out in detail in \secref{sec:assumptions}.
+The resulting information-theoretic bounds on precision hold true whether the measurement is made using a Bayesian or frequentist framework. %HOGG: true?
+In this work, we concentrate on the frequentist concept of information-theoretic bounds on maximum-likelihood estimators of the radial velocity. 
+However, many of the considerations that we discuss will apply also in the Bayesian case. 
 In particular, the importance of the assumptions underlying the likelihood function, and the correctness or incorrectness of those assumptions, are equally important in both statistical philosophies.
-The set of assumptions at play in this particular case are laid out in \secref{sec:assumptions}.
 
-Radial-velocity measurements are bound-saturating (minimum variance unbiased estimates) when they are maximum-likelihood estimates; this point is discussed in \secref{sec:info}.
+%BEDELL: make sure that the following deletions are covered in other sections
+%Strictly speaking, there is no stellar-theory-independent measurement of any single radial velocity, because the radial velocity measurement is a measurement of the difference between the observed and true (rest-frame) wavelengths of particular absorption lines, which are produced by non-trivial models of stellar atmospheres.
+%But \emph{changes in time} of the radial velocity of a star can be measured with almost no input of the theory of stellar atmospheres.
+%This is because the changes from epoch to epoch shift the spectrum straightforwardly.
+%The shift can be measured even without any physical model for the true rest-frame spectrum.
+%If the stellar spectrum doesn't vary---a strong assumption---and some other assumptions about the noise are valid, then changes in radial velocity can be measured with unlimited accuracy, in the sense that the measurements should just get better linearly with the total signal-to-noise in the data set.
+
+%Whether you are a Bayesian or a frequentist, you make the best measurements by having a \emph{generative model} for your data.
+%In both cases, this takes the form of a likelihood function, or a probability density for the data, evaluated at the data, parameterized by a set of parameters including your parameter of interest.
+%In the Bayesian context, the likelihood function is used to update your beliefs; the posterior probability density function (\pdf) is the prior \pdf\ times the likelihood function (and renormalized).
+%In the frequentist context, the likelihood function can be optimized to produce bound-saturating maximum-likelihood estimates of the parameter of interest.
+%In what follows, we concentrate on the latter---information-theoretic bounds on frequentist estimators---but many of the considerations in this \documentname{} will apply also in the Bayesian setting.
+%In particular, the importance of the assumptions underlying the likelihood function, and the correctness or incorrectness of those assumptions, are equally important in both statistical philosophies.
+%The set of assumptions at play in this particular case are laid out in \secref{sec:assumptions}.
+
+The information-theoretic concepts of Fisher information and the Cram\'er-Rao bound, which we describe in Section \secref{sec:info}, have a considerable history of application to astronomy \citep{CITE}. 
+In this work, we use these concepts as a framework within which to situate the relative performances of different model estimators. 
+Radial-velocity measurements are bound-saturating (minimum variance unbiased estimates) when they are maximum-likelihood estimates.
 When the likelihood function is Gaussian, or close to it, maximum-likelihood estimates can be found by cross-correlation with a spectral template, provided that the spectral template is a good fit to the stellar spectrum; we discuss this in \secref{sec:ccf}.
 The original motivation for this \documentname{} was the observation that many radial-velocity data-analysis pipelines perform cross-correlations with a binary mask (for example, \citealt{pepe}; CITE OTHERS), which is manifestly \emph{not} a good fit to any stellar spectrum!
 Nonetheless, they produce good radial-velocity measurements.
@@ -702,13 +719,13 @@ HOGG: Do the time-invariant spectrum assumption last and discuss the different p
 \begin{acknowledgments}
 It is a pleasure to thank
   Jacob Bean (Chicago),
-  John Brewer (Yale),
+  John Brewer (SFSU),
   Matthew Daunt (NYU),
   Dan Foreman-Mackey (Flatiron),
-  Ben Montet (Chicago),
+  Ben Montet (UNSW),
   Adrian Price-Whelan (Flatiron),
   Hans-Walter Rix (MPIA),
-  Julian Stuermer (Chicago),
+  Julian Stuermer (Uni Heidelberg),
   Lily Zhao (Flatiron),
 and the Astronomical Data Group at the Flatiron Institute for valuable discussions and input.
 MB thanks the Max-Planck-Institut f\"ur Astronomie in Heidelberg
