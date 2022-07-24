@@ -687,13 +687,15 @@ It is interesting to note that this toy spectral variability contaminates the Do
 
 \section{Discussion}\label{sec:discussion}
 
-In this \documentname, we HOGG: What, roughly, is most important about the above?
+The exoplanet and binary-star literature contains many expressions for the theoretical precision at which a stellar radial velocity measurement can be made with a spectrograph (for example, \citealt{whatever}).
+In this \documentname, we have provided information-theoretic justification for these expressions, with a clear set of assumptions, and with a bit more generality.
 
-- Info theory precision result. Contextualize with existing formulations. All is well here.
+HOGG: DO WE NEED TO SAY MORE ALONG THESE LINES? Like contextualize with existing formulations?
 
-- Do different methods saturate this bound? Yes, yes they can and do; we have choices.
-
-- Under conditions, the in-practice binary-mask method is a good method; that is, current pipelines probably do saturate the bound. BUT this result depends on strong assumptions (list here!); we elucidate that. mask convolved with gaussian is good; line EWs; LSF; etc.
+Most Extreme-precision radial-velocity spectrograph pipelines in fact measure radial velocities by a particular standard method, which involves cross-correlation with a binary mask, followed by fitting a Gaussian (or other smooth function) to that cross-correlation.
+Our results suggest that there might be simpler methods than this, and also more precise methods in many contexts.
+However, our results also show that the standard method can be close-to-optimal under reasonable assumptions.
+These assumptions will be more true for Sun-like stars and less true as we move to stars for which it is hard to make a good binary mask (such as M dwarfs).
 
 - We don't test all our myriad assumptions, but the ones we do test appear to be significant; there is a possible full flow-down. Cite Halverson here.
 
@@ -707,7 +709,15 @@ HOGG: In the above, make sure to comment on the conceptual point of whether you 
 
 HOGG: Then further contextualize in terms of what is done with the RVs after. Perhaps make the point that if you do anything with priors, people can't use the RVs in all the ways they might think that they can?!
 
-HOGG: Do the time-invariant spectrum assumption last and discuss the different possible approaches to this problem. Many of these are being pursued! Cite everyone.
+All results on radial-velocity measurement precision, and all of the methods for actually making measurements, depend on the stellar spectrum being (even in fine details) invariant with time.
+This is because they depend on comparing the spectrum at each epoch to an unchanging template, or to spectra at other epochs.
+Indeed, it is possible to take a hard position that the radial-velocity isn't even well defined if the stellar spectrum varies:
+Without a complete model of what is changing in the spectrum, it is impossible to uniquely assign changes to either the Doppler effect or intrinsic spectral variations.
+Our intuition is that solutions to this problem will be statistical, making use of ideas from causal inference to separate intrinsic spectral variability from radial-velocity variations.
+
+This problem---How to measure a precise radial velocity when the stellar spectrum is variable---is an unsolved problem in astrophysics.
+The fact that current extreme-precision spectrographs are not generally delivering $\cmps$-level radial-velocity data for many stars is probably at some level because of unmodeled stellar variability (convection, granulation, spots, activity, and so forth).
+Our view is that rigorous solutions to this measurement problem, under sensible assumptions, is critical to the next phase of exoplanet research, and might even have big impacts on projects at the present day.
 
 \software{
 \project{numpy} \citep{numpy} ---
