@@ -697,19 +697,35 @@ Our results suggest that there might be simpler methods than this, and also more
 However, our results also show that the standard method can be close-to-optimal under reasonable assumptions.
 These assumptions will be more true for Sun-like stars and less true as we move to stars for which it is hard to make a good binary mask (such as M dwarfs).
 
-- We don't test all our myriad assumptions, but the ones we do test appear to be significant; there is a possible full flow-down. Cite Halverson here.
+Speaking of assumptions: We make many for all of our results!
+There are many respects in which real EPRV data will not satisfy our assumptions in detail.
+In \secref{sec:sensitivity} we show hints that indeed our results are sensitive to the important assumptions about tellurics and spectral variability.
+We do not, however, perform a full, quantitative sensitivity analysis.
+This might be a good idea for planning hardware and surveys, and there are some examples of work along these lines in the literature (\citealt{halverson}).
 
-HOGG: How do our quantitative results on our toy data relate to quantitative results on a real star? It's complicated because it depends on the real lines and the spectral coverage (and resolution and so on).
+In addition, another unreality of this work is that we use a completely fake spectrum in an arbitrary wavelength range at hard-set resolution.
+The real precision of a real spectrograph observing a real star depends on the true spectrum and the true resolution and noise.
+We didn't perform the realistic calculation because this calculation exists elsewhere, and is correct (\citealt{whatever}).
+The point of this paper is conceptual, about information theory and theoretical questions for data analysis.
 
-HOGG: Do any of the assumptions change in the face of new technology, new spectrographs, etc? Discuss them at least briefly, and what happens if you want to weaken them. Ground vs space? Cite NASA peeps.
+One question for the EPRV field is whether the future looks, qualitiatively, like the past?
+If EPRV moves to space (for example, \citealt{whatever}), there might be huge advantages in terms of spectral quality and calibration.
+Tellurics, for example, might not matter, and it might be possible to make absolute (rather than continuum-normalized) flux measurements.
+These changes wouldn't change anything fundamental here.
+But it might change how we design our pipelines and make our measurments in detail.
 
-HOGG: Contextualize this work in general RV science (beyond EPRV): What about ACCURATE RV?? What about single-epoch? What about low-R spectrographs? (Call out Gaia here!?) 
+Nothing about the analysis here depends on high resolution, however.
+Measurements of quasar or galaxy redshifts at lower resolution are subject to the same bounds.
+One interesting difference though is that when we measure extragalactic redshifts---or when ESA \textsl{Gaia} measures stellar radial velocities (\citealt{gaiarvs})---the intention is to measure \emph{absolute} radial velocities relative to the Milky Way (or Solar System) reference frame, not just relative velocities.
+The measurement of an absolute velocity depends not just on a spectral template, but on an \emph{accurate} spectral template, that is computed in a suitable rest frame.
+That's hard at the present day, and limits the precision of all absolute velocity measurements, in both Galactic and extragalactic contexts.
+The work we have presented here addresses only the precision of relative radial-velocity measurements and not the accuracy of any absolute measurement.
 
 HOGG: In the above, make sure to comment on the conceptual point of whether you are measuring a velocity wrt the spectrograph, or a velocity wrt the Solar-System barycenter (as EXPRES does). This distinction is important to the design of extraction pipelines, but doesn't change any of our story here.
 
 HOGG: Then further contextualize in terms of what is done with the RVs after. Perhaps make the point that if you do anything with priors, people can't use the RVs in all the ways they might think that they can?!
 
-All results on radial-velocity measurement precision, and all of the methods for actually making measurements, depend on the stellar spectrum being (even in fine details) invariant with time.
+Finally, and most importantly, all results on radial-velocity measurement precision, and all of the methods for actually making measurements, depend on the stellar spectrum being (even in fine details) invariant with time.
 This is because they depend on comparing the spectrum at each epoch to an unchanging template, or to spectra at other epochs.
 Indeed, it is possible to take a hard position that the radial-velocity isn't even well defined if the stellar spectrum varies:
 Without a complete model of what is changing in the spectrum, it is impossible to uniquely assign changes to either the Doppler effect or intrinsic spectral variations.
