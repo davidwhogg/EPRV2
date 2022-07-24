@@ -11,7 +11,6 @@
 % - Make an acronym command and fix CLRB, RV, and all other acronyms.
 % - Be sure to discuss SNR in a continuum resolution element, as well as in a pixel.
 %.- Make sure that, for any assumption that is explicitly tested, the forthcoming test is mentioned when the assumption is introduced.
-% - Are we consistent in our use of Doppler shift, radial velocity, and redshift and so on? Fix figure captions so the figures are clearly in RV. Edit radial Doppler assumption section to say that the terms are interchangeable unless the star is moving relativistically (which it's not). cite Wright-group paper. Make it clear that for US, RV *is* the same as c * dx.
 % - Do we address the relationship between our tiny spectral segment and a full spectrograph? Get scalings. Etc. Possibly we should ask Daunt to give us a realistic spectral segment?
 % - Make sure we are explicit about what we are assuming that we know when we fit the CCF with a Gaussian.
 % - Make sure all figures are explicitly referred to in the text.
@@ -227,7 +226,7 @@ These are the assumptions we will make in this project:
     Related to this, there is a deep assumption that the radial velocity has the same value everywhere in the spectrum.
     This might seem obviously true!
     But in fact it is weakly violated in real data because the throughput of the atmosphere plus spectrograph can be a function of both wavelength and time, and the barycentric contribution to the radial velocity is changing during the exposure (\citealt{berv-lambda}). 
-    We assume that all of these effects are negligible, and the Doppler shift of a given spectrum can be straightforwardly interpreted in terms of a single radial velocity.
+    We assume that all of these effects are negligible, and the Doppler shift of a given spectrum can be straightforwardly interpreted in terms of a single radial velocity; thus for our purposes these terms (Doppler shift and radial velocity) can be used interchangeably.
 \end{description}
 Every one of these assumptions is wrong, or badly wrong, or at least questionable.
 We will return to them at the end in \secref{sec:sensitivity} and \secref{sec:discussion}.
@@ -688,7 +687,7 @@ It is interesting to note that this toy spectral variability contaminates the Do
 
 \section{Discussion}\label{sec:discussion}
 
-HOGG: What, roughly, is most important about the above?
+In this \documentname, we HOGG: What, roughly, is most important about the above?
 
 - Info theory precision result. Contextualize with existing formulations. All is well here.
 
