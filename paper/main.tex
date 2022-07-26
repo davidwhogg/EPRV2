@@ -638,7 +638,7 @@ It is interesting to note that this systematic wavelength-calibration noise cont
 As stated in \secref{sec:assumptions}, in everything above we assumed that telluric lines either don't exist, or else are handled properly.
 Telluric lines can be handled by fitting and subtracting them, or by masking the data at their locations.
 However, it is possible for there to be tiny, unknown telluric features that affect the data but aren't either known or individually detectable.
-The possible existence of these lines was one of the motivations for the \textsl{wobble} project (\citealt{wobble}.
+The possible existence of these lines was one of the motivations for the \project{wobble} project (\citealt{wobble}.
 
 Here we test the sensitivity to unmodeled telluric contamination by creating a substantial number of very low amplitude absorption lines and combining them into a telluric template, much as we create the spectral template above in \secref{sec:data}.
 The telluric template created this way is shown in \figref{fig:telluric}.
@@ -690,9 +690,9 @@ It is interesting to note that this toy spectral variability contaminates the Do
 The exoplanet and binary-star literature contains many expressions for the theoretical precision at which a stellar radial velocity measurement can be made with a spectrograph (for example, \citealt{whatever}).
 In this \documentname, we have provided information-theoretic justification for these expressions, with a clear set of assumptions, and with a bit more generality.
 
-HOGG: DO WE NEED TO SAY MORE ALONG THESE LINES? Like contextualize with existing formulations?
+BEDELL: DO WE NEED TO SAY MORE ALONG THESE LINES? Like contextualize with existing formulations? Or give our result in words, like ``the inner product of the derivative of blah with blah''?
 
-Most Extreme-precision radial-velocity spectrograph pipelines in fact measure radial velocities by a particular standard method, which involves cross-correlation with a binary mask, followed by fitting a Gaussian (or other smooth function) to that cross-correlation.
+Most extreme-precision radial-velocity (EPRV) spectrograph pipelines in fact measure radial velocities by a particular standard method, which involves cross-correlation with a binary mask, followed by fitting a Gaussian (or other smooth function) to that cross-correlation.
 Our results suggest that there might be simpler methods than this, and also more precise methods in many contexts.
 However, our results also show that the standard method can be close-to-optimal under reasonable assumptions.
 These assumptions will be more true for Sun-like stars and less true as we move to stars for which it is hard to make a good binary mask (such as M dwarfs).
@@ -705,23 +705,24 @@ This might be a good idea for planning hardware and surveys, and there are some 
 
 In addition, another unreality of this work is that we use a completely fake spectrum in an arbitrary wavelength range at hard-set resolution.
 The real precision of a real spectrograph observing a real star depends on the true spectrum and the true resolution and noise.
-We didn't perform the realistic calculation because this calculation exists elsewhere, and is correct (\citealt{whatever}).
+We didn't perform the realistic calculation because such calculations are very context-dependent, they exist elsewhere (\citealt{whatever}), and they are correct.
 The point of this paper is conceptual, about information theory and theoretical questions for data analysis.
 
-One question for the EPRV field is whether the future looks, qualitiatively, like the past?
+One question for the EPRV field is whether the future looks, qualitatively, like the past?
 If EPRV moves to space (for example, \citealt{whatever}), there might be huge advantages in terms of spectral quality and calibration.
-Tellurics, for example, might not matter, and it might be possible to make absolute (rather than continuum-normalized) flux measurements.
+Tellurics, for example, might not matter in space (although interstellar lines will still be present), and it might be possible to make absolute (rather than continuum-normalized) flux measurements.
 These changes wouldn't change anything fundamental here.
-But it might change how we design our pipelines and make our measurments in detail.
+But it might change how we design our pipelines and make our measurements in detail.
 
 Nothing about the analysis here depends on high resolution, however.
 Measurements of quasar or galaxy redshifts at lower resolution are subject to the same bounds.
-One interesting difference though is that when we measure extragalactic redshifts---or when ESA \textsl{Gaia} measures stellar radial velocities (\citealt{gaiarvs})---the intention is to measure \emph{absolute} radial velocities relative to the Milky Way (or Solar System) reference frame, not just relative velocities.
+One interesting difference though is that when we measure extragalactic redshifts---or when ESA \project{Gaia} measures stellar radial velocities (\citealt{gaiarvs})---the intention is to measure \emph{absolute} radial velocities relative to the Milky Way (or Solar System) reference frame, not just relative velocities (such as velocity differences from epoch to epoch).
 The measurement of an absolute velocity depends not just on a spectral template, but on an \emph{accurate} spectral template, that is computed in a suitable rest frame.
-That's hard at the present day, and limits the precision of all absolute velocity measurements, in both Galactic and extragalactic contexts.
+That's hard at the present day, because of details of stellar photospheres and convective shifts, and so on (\citealt{something}).
+These absolute-spectral-template issues limit the precision of all absolute velocity measurements, in both Galactic and extragalactic contexts.
 The work we have presented here addresses only the precision of relative radial-velocity measurements and not the accuracy of any absolute measurement.
 
-HOGG: In the above, make sure to comment on the conceptual point of whether you are measuring a velocity wrt the spectrograph, or a velocity wrt the Solar-System barycenter (as EXPRES does). This distinction is important to the design of extraction pipelines, but doesn't change any of our story here.
+HOGG: In the above, make sure to comment on the conceptual point of whether you are measuring a velocity wrt the spectrograph, or a velocity wrt the Solar-System barycenter (as \project{EXPRES} does). This distinction is important to the design of extraction pipelines, but doesn't change any of our story here.
 
 HOGG: Then further contextualize in terms of what is done with the RVs after. Perhaps make the point that if you do anything with priors, people can't use the RVs in all the ways they might think that they can?!
 
